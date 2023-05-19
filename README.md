@@ -25,3 +25,4 @@ Currently tested on ubuntu 22.04
 - Media folder for storing assets
 - Shader folder for storing shaders
 - Simple main.cpp hello triangle example
+- Color Picker using dearimgui
