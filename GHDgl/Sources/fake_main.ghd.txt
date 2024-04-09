@@ -1,0 +1,135 @@
+#include <iostream>
+#include <vector>
+#include <string>
+
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
+#include "Shader.h"
+
+// Vertex Shader source code
+const char *vertexShaderSource = R"(
+    #version 330 core
+    layout (location = 0) in vec3 aPos;
+
+    void main()
+    {
+        gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+    }
+)";
+
+// Fragment Shader source code
+const char *fragmentShaderSource = R"(
+    #version 330 core
+    out vec4 FragColor;
+
+    uniform vec3 triangleColor;  // New uniform variable
+
+    void main()
+    {
+        FragColor = vec4(triangleColor, 1.0f);
+    }
+)";
+
+int main()
+{
+    // Initialization and GLFW window creation
+    GLFWwindow* window;
+    int flag;
+    flag = initialization(window, 800, 600, "GHDgl");
+    if (flag == -1)
+        return flag;
+
+    ///////////////////////////// Scene Setup /////////////////////////////
+
+    Shader flatShader("flatShader.vert", "flatShader.frag");
+    flatShader.use();
+    flatShader.uniform_3f("color", 0.0f, 1.0f, 0.0f);
+
+    // Triangle color (is set from color picker and is passed to shader as a uniform)
+    glm::vec3 triangleColor(0.0f, 1.0f, 0.0f);
+
+    // Set up vertex data and buffers
+    float vertices[] = {
+        -0.5f, -0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
+        0.0f, 0.5f, 0.0f};
+
+    GLuint VAO, VBO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+    glEnableVertexAttribArray(0);
+
+    // Unbind stuff
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    // Main loop
+    while (!glfwWindowShouldClose(window))
+    {
+        /////////////////////////////////// Input ///////////////////////////////////
+
+        // Esc key to exit the program
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+            glfwSetWindowShouldClose(window, true);
+
+        /////////////////////////////////// Draw ///////////////////////////////////
+
+        // Clear background
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        // Render The triangle
+        glUseProgram(shaderProgram);
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        //////////////////////////////////// UI ////////////////////////////////////
+
+        // Start the ImGui frame
+        ImGuiNewFrame();
+
+        // Color picker
+        ImGui::Begin("Color Picker");
+        if (ImGui::ColorPicker3("Triangle Color", glm::value_ptr(triangleColor)))
+        {
+            // If the color picker value changed, update the uniform
+            // int colorUniformLocation = glGetUniformLocation(shaderProgram, "triangleColor");
+            // glUseProgram(shaderProgram);
+            // glUniform3fv(colorUniformLocation, 1, glm::value_ptr(triangleColor));
+            // TODO
+        }
+        ImGui::End();
+
+        // Render ImGui
+        ImGui::Render(); ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        // Check and call events and swap the buffers
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    
+    } // Main loop end
+
+    // Cleanup
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteProgram(shaderProgram);
+
+    // Cleanup ImGui
+    ImGuiCleanup()
+
+    // Terminate GLFW
+    glfwTerminate();
+    return 0;
+}
