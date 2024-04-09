@@ -1,6 +1,7 @@
 # GHDgl
 
-A very simple and barebone opengl starter project using CMake.
+My personal OpenGL sandbox project.
+I plan to implement various OpenGL features and techniques in this project.
 
 ![demo](demo.png)
 Currently tested on ubuntu 22.04
@@ -22,8 +23,21 @@ Currently tested on ubuntu 22.04
 
 ## Features
 
-- Simple CMakeLists.txt
-- Media folder for storing assets
-- Shader folder for storing shaders
 - Simple main.cpp hello triangle example
 - Color Picker using dearimgui
+
+## TODO
+
+- Add TODO items!
+
+## Build
+
+```bash
+$ git clone repo
+$ cd GHDgl
+$ mkdir build
+$ cd build
+$ cmake ..
+$ make
+$ ./GHDgl
+```
