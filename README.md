@@ -8,6 +8,7 @@ Currently tested on ubuntu 22.04
 ## Dependencies
 
 - Must have glfw3 installed
+- Must have cmake installed
 
 ## Stack
 
