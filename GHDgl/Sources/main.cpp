@@ -39,10 +39,10 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 }
 
 // Callback function for ImGui color picker
-void ColorPickerCallback(const ImVec4& color, void* userData)
+void ColorPickerCallback(const ImVec4 &color, void *userData)
 {
     // Cast the userData to the desired data type
-    glm::vec3* triangleColor = static_cast<glm::vec3*>(userData);
+    glm::vec3 *triangleColor = static_cast<glm::vec3 *>(userData);
 
     // Update the triangle color
     triangleColor->r = color.x;
@@ -105,7 +105,7 @@ int main()
     {
         glGetShaderInfoLog(vertexShader, 512, nullptr, infoLog);
         std::cerr << "Failed to compile Vertex Shader:\n"
-                  << infoLog << std::endl;
+                << infoLog << std::endl;
         glfwTerminate();
         return -1;
     }
@@ -121,7 +121,7 @@ int main()
     {
         glGetShaderInfoLog(fragmentShader, 512, nullptr, infoLog);
         std::cerr << "Failed to compile Fragment Shader:\n"
-                  << infoLog << std::endl;
+                << infoLog << std::endl;
         glfwTerminate();
         return -1;
     }
@@ -138,7 +138,7 @@ int main()
     {
         glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
         std::cerr << "Failed to link shader program:\n"
-                  << infoLog << std::endl;
+                << infoLog << std::endl;
         glfwTerminate();
         return -1;
     }
@@ -173,7 +173,7 @@ int main()
     // Initialize ImGui
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
+    ImGuiIO &io = ImGui::GetIO();
     (void)io;
 
     // Setup ImGui platform/renderer bindings
@@ -190,7 +190,7 @@ int main()
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, true);
 
-        // Clear background 
+        // Clear background
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 

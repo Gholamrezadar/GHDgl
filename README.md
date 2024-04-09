@@ -4,7 +4,7 @@ My personal OpenGL sandbox project.
 I plan to implement various OpenGL features and techniques in this project.
 
 ![demo](demo.png)
-Currently tested on ubuntu 22.04
+Currently tested on Windows 10 (MinGW)
 
 ## Dependencies
 
@@ -38,6 +38,6 @@ $ cd GHDgl
 $ mkdir build
 $ cd build
 $ cmake ..
-$ make
+$ cmake --build .
 $ ./GHDgl
 ```

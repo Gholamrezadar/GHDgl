@@ -6,7 +6,12 @@ set(CMAKE_CXX_STANDARD 17)
 
 # Find required packages
 find_package(OpenGL REQUIRED)
-find_package(glfw3 REQUIRED)
+
+# Add glfw library
+add_subdirectory(vendor/glfw)
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE) # don't build docs
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE) # don't build tests
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE) # don't build examples
 
 # Add glad library
 add_library(glad STATIC vendor/glad/src/glad.c)
@@ -16,23 +21,26 @@ target_include_directories(glad PUBLIC vendor/glad/include)
 add_library(stb_image STATIC vendor/stb_image/stb_image.cpp)
 target_include_directories(stb_image PUBLIC vendor/stb_image)
 
-
 # Header Files
-file(GLOB PROJECT_HEADERS GHDgl/Headers/*.h
-                        GHDgl/Headers/*.hpp)
+file(GLOB PROJECT_HEADERS ${PROJECT_NAME}/Headers/*.h
+                        ${PROJECT_NAME}/Headers/*.hpp)
 # Source Files
-file(GLOB PROJECT_SOURCES GHDgl/Sources/*.cpp)
+file(GLOB PROJECT_SOURCES ${PROJECT_NAME}/Sources/*.cpp)
+
 # Shader Files
-file(GLOB PROJECT_SHADERS GHDgl/Shaders/*.comp
-                        GHDgl/Shaders/*.frag
-                        GHDgl/Shaders/*.geom
-                        GHDgl/Shaders/*.vert)
+file(GLOB PROJECT_SHADERS ${PROJECT_NAME}/Shaders/*.comp
+                        ${PROJECT_NAME}/Shaders/*.frag
+                        ${PROJECT_NAME}/Shaders/*.geom
+                        ${PROJECT_NAME}/Shaders/*.vert)
 # Image Files
-file(GLOB PROJECT_IMAGES GHDgl/Media/Images/*.png
-                        GHDgl/Media/Images/*.jpg)
+file(GLOB PROJECT_IMAGES ${PROJECT_NAME}/Media/Images/*.png
+                        ${PROJECT_NAME}/Media/Images/*.jpg)
 
 # Add the ImGui include directory
 include_directories(vendor/imgui)
+
+# Add the vendor include directory for glm
+include_directories(vendor)
 
 # Add the ImGui source files
 file(GLOB IMGUI_SOURCES vendor/imgui/*.cpp)
@@ -45,7 +53,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_NAME})
 
 # Link libraries
-target_link_libraries(${PROJECT_NAME} PRIVATE glfw glad stb_image ${OPENGL_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PRIVATE glad stb_image glfw ${GLFW_LIBRARIES} ${OPENGL_LIBRARIES})
 
 # Copy Shaders into the build directory
 add_custom_command(
