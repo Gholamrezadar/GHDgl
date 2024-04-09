@@ -8,6 +8,7 @@ Currently tested on ubuntu 22.04
 ## Dependencies
 
 - Must have glfw3 installed
+- Must have cmake installed
 
 ## Stack
 
@@ -26,3 +27,15 @@ Currently tested on ubuntu 22.04
 - Shader folder for storing shaders
 - Simple main.cpp hello triangle example
 - Color Picker using dearimgui
+
+## Build
+
+```bash
+$ git clone repo
+$ cd GHDgl
+$ mkdir build
+$ cd build
+$ cmake ..
+$ make
+$ ./GHDgl
+```
