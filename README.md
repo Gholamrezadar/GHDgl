@@ -52,5 +52,5 @@ Square with EBO
 Simple Texture
 ![texture](demos/texture.png)
 
-Texture with mixed color
+Texture mixed with color
 ![texture_mixed](demos/texture_mixed.png)
