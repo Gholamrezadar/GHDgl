@@ -43,24 +43,25 @@ $ ./GHDgl
 
 ## Demos
 
-Triangle with vertex color
-![tricolor_triangle](demos/tricolor_triangle.png)
 
-Square with EBO
-![square_ebo](demos/square_ebo.png)
 
-Simple Texture
-![texture](demos/texture.png)
-
-Texture mixed with color
-![texture_mixed](demos/texture_mixed.png)
-
-MVP Matrices
-![mvp](demos/MVP.png)
-
-Cube
-![cube](demos/cube.png)
-
-Rotated Cube
+7. Rotated Cube
 ![rotated_cube](demos/rotated_cube.png)
 
+6. Cube
+![cube](demos/cube.png)
+
+5. MVP Matrices
+![mvp](demos/MVP.png)
+
+4. Texture mixed with color
+![texture_mixed](demos/texture_mixed.png)
+
+3. Simple Texture
+![texture](demos/texture.png)
+
+2. Square with EBO
+![square_ebo](demos/square_ebo.png)
+
+1. Triangle with vertex color
+![tricolor_triangle](demos/tricolor_triangle.png)
