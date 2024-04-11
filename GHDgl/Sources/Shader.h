@@ -37,6 +37,9 @@ public:
     // Sets a 4f uniform
     void uniform_4f(const char* name, float v0, float v1, float v2, float v3);
 
+	// sets a 4D matrix
+	void uniform_mat4(const char* name, float* mat4);
+
 private:
 	// Checks if the different Shaders have compiled properly
 	void compileErrors(unsigned int shader, const char* type);

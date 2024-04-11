@@ -21,6 +21,13 @@
 const int scr_width = 800;
 const int scr_height = 800;
 
+
+void processInput(GLFWwindow *window)
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+}
+
 int main()
 {
     // Initialization and GLFW window creation
@@ -32,14 +39,30 @@ int main()
 
     ///////////////////////////// Scene Setup /////////////////////////////
 
-    // textured shader
+    // MVP matrices
+    glm::mat4 model = glm::mat4(1.0f);
+    // 55 degree rotation along x-axis
+    model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f)); 
+
+    glm::mat4 view = glm::mat4(1.0f);
+    // note that we're translating the scene in the reverse direction of where we want to move
+    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f)); 
+
+    glm::mat4 projection;
+    projection = glm::perspective(glm::radians(45.0f), (float)scr_height / (float)scr_width, 0.1f, 100.0f);
+
+
+    // Transformed textured shader
     Shader flatTextureShader("Shaders/flatTextureShader.vert", "Shaders/flatTextureShader.frag");
     flatTextureShader.use();
     flatTextureShader.uniform_3f("color", 0.0f, 1.0f, 0.0f);
     flatTextureShader.uniform_1f("texture1", 0);
+    flatTextureShader.uniform_mat4("model", glm::value_ptr(model));
+    flatTextureShader.uniform_mat4("view", glm::value_ptr(view));
+    flatTextureShader.uniform_mat4("projection", glm::value_ptr(projection));
 
     // Triangle color (is set from color picker and is passed to shader as a uniform)
-    glm::vec3 triangleColor(0.0f, 1.0f, 0.0f);
+    glm::vec3 triangleColor(1.0f, 1.0f, 1.0f);
     
     float triangle[] = 
     {
@@ -65,11 +88,56 @@ int main()
         0, 3, 2 // Lower triangle
     };
 
+    float cube[] = {
+        // positions          // colors           // texture coords
+        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,
+
+        -0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,
+
+        -0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,
+
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,
+
+        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,
+
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f
+    };
+
     // Mesh
     VAO VAO1;
     VAO1.bind();
-    VBO VBO1(square, sizeof(square));
-    EBO EBO1(square_indices, sizeof(square_indices));
+    VBO VBO1(cube, sizeof(cube));
+    // EBO EBO1(square_indices, sizeof(square_indices));
 
     VAO1.linkAttrib(0, 3, GL_FLOAT, 8 * sizeof(float), (void *)0); // coordinates
     VAO1.linkAttrib(1, 3, GL_FLOAT, 8 * sizeof(float), (void *)(3 * sizeof(float))); // color
@@ -77,7 +145,7 @@ int main()
 
     // Unbind stuff
     VBO1.unbind();
-    EBO1.unbind();
+    // EBO1.unbind();
     VAO1.unbind();
 
     // Texture
@@ -86,29 +154,34 @@ int main()
 
     // Main loop
     int frameNumber = 0;
+    static float angle = 0.0f;
+    
+    // create a backup of model matrix
+    glm::mat4 modelBackup = model;
+
+
     while (!glfwWindowShouldClose(window))
     {
         // std::cout << "Frame number: " << frameNumber << "\n";
         
         /////////////////////////////////// Input ///////////////////////////////////
 
-        // Esc key to exit the program
-        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-            glfwSetWindowShouldClose(window, true);
+        processInput(window);
 
         /////////////////////////////////// Draw ///////////////////////////////////
 
         // Clear background
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Render The Mesh
         container_texture.bind();
         flatTextureShader.use();
         VAO1.bind();
-        EBO1.bind();
+        // EBO1.bind();
         VBO1.bind();
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         //////////////////////////////////// UI ////////////////////////////////////
 
@@ -120,6 +193,16 @@ int main()
         if (ImGui::ColorPicker3("Shader Color", glm::value_ptr(triangleColor)))
         {
             flatTextureShader.uniform_3f("color", triangleColor.r, triangleColor.g, triangleColor.b);
+        }
+        ImGui::End();
+
+        // a float slider that controls model rotation angle
+        ImGui::Begin("Model Rotation");
+
+        if (ImGui::SliderFloat("Angle", &angle, 0.0f, 360.0f))
+        {
+            model = glm::rotate(modelBackup, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
+            flatTextureShader.uniform_mat4("model", glm::value_ptr(model));
         }
         ImGui::End();
 

@@ -113,6 +113,13 @@ void Shader::uniform_4f(const char *name, float v0, float v1, float v2, float v3
     glUniform4f(colorUniformLocation, v0, v1, v2, v3);
 }
 
+void Shader::uniform_mat4(const char *name, float *mat4)
+{
+	int UniformLocation = glGetUniformLocation(id, name);
+	glUseProgram(id);
+	glUniformMatrix4fv(UniformLocation, 1, GL_FALSE, mat4);
+}
+
 // Checks if the different Shaders have compiled properly
 void Shader::compileErrors(unsigned int shader, const char* type)
 {

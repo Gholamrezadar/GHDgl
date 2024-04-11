@@ -54,3 +54,13 @@ Simple Texture
 
 Texture mixed with color
 ![texture_mixed](demos/texture_mixed.png)
+
+MVP Matrices
+![mvp](demos/MVP.png)
+
+Cube
+![cube](demos/cube.png)
+
+Rotated Cube
+![rotated_cube](demos/rotated_cube.png)
+

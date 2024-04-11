@@ -55,6 +55,9 @@ int initialization(GLFWwindow*& window, int width, int height, const char* title
         return -1;
     }
 
+    // configure global opengl state
+    glEnable(GL_DEPTH_TEST);
+
     // Set the viewport dimensions
     int screenWidth, screenHeight;
     glfwGetFramebufferSize(window, &screenWidth, &screenHeight);

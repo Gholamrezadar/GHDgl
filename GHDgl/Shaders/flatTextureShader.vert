@@ -6,9 +6,14 @@ layout(location = 2) in vec2 aTexCoord;
 out vec3 vertexColor;
 out vec2 TexCoord;
 
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
 void main()
 {
-    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+    // note that we read the multiplication from right to left
+    gl_Position = projection * view * model * vec4(aPos, 1.0);
     vertexColor = aColor;
     TexCoord = aTexCoord;
 }
