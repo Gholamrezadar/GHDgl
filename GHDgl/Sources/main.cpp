@@ -34,13 +34,7 @@ int main()
 
     // Triangle color (is set from color picker and is passed to shader as a uniform)
     glm::vec3 triangleColor(0.0f, 1.0f, 0.0f);
-
-    // Set up vertex data and buffers
-    // std::vector<Vertex> triangle;
-    // triangle.push_back(Vertex(glm::vec3(-0.5f, -0.5f, 0.0f)));
-    // triangle.push_back(Vertex(glm::vec3(0.5f, -0.5f, 0.0f)));
-    // triangle.push_back(Vertex(glm::vec3(0.0f, 0.5f, 0.0f)));
-
+    
     float triangle[] = {
         -0.5f, -0.5f, 0.0f,
         0.5f, -0.5f, 0.0f,
