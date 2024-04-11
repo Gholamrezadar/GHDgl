@@ -11,6 +11,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
+#include "Texturee.h"
 #include "Shader.h"
 #include "VAO.h"
 #include "VBO.h"
@@ -31,10 +32,11 @@ int main()
 
     ///////////////////////////// Scene Setup /////////////////////////////
 
-    // flat shader
-    Shader flatShader("Shaders/flatShader.vert", "Shaders/flatShader.frag");
-    flatShader.use();
-    flatShader.uniform_3f("color", 0.0f, 1.0f, 0.0f);
+    // textured shader
+    Shader flatTextureShader("Shaders/flatTextureShader.vert", "Shaders/flatTextureShader.frag");
+    flatTextureShader.use();
+    flatTextureShader.uniform_3f("color", 0.0f, 1.0f, 0.0f);
+    flatTextureShader.uniform_1f("texture1", 0);
 
     // Triangle color (is set from color picker and is passed to shader as a uniform)
     glm::vec3 triangleColor(0.0f, 1.0f, 0.0f);
@@ -63,7 +65,7 @@ int main()
         0, 3, 2 // Lower triangle
     };
 
-    // VAO, VBO
+    // Mesh
     VAO VAO1;
     VAO1.bind();
     VBO VBO1(square, sizeof(square));
@@ -77,6 +79,10 @@ int main()
     VBO1.unbind();
     EBO1.unbind();
     VAO1.unbind();
+
+    // Texture
+    const char* image_address = "Images/container.jpg";
+    Texturee container_texture(image_address, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
 
     // Main loop
     int frameNumber = 0;
@@ -97,7 +103,8 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Render The Mesh
-        flatShader.use();
+        container_texture.bind();
+        flatTextureShader.use();
         VAO1.bind();
         EBO1.bind();
         VBO1.bind();
@@ -112,7 +119,7 @@ int main()
         ImGui::Begin("Color Picker");
         if (ImGui::ColorPicker3("Shader Color", glm::value_ptr(triangleColor)))
         {
-            flatShader.uniform_3f("color", triangleColor.r, triangleColor.g, triangleColor.b);
+            flatTextureShader.uniform_3f("color", triangleColor.r, triangleColor.g, triangleColor.b);
         }
         ImGui::End();
 
@@ -130,7 +137,8 @@ int main()
     // Cleanup and terminate
     VAO1.remove();
     VBO1.remove();
-    flatShader.remove();
+    flatTextureShader.remove();
+    container_texture.remove();
     ImGuiCleanup();
     glfwTerminate();
 
