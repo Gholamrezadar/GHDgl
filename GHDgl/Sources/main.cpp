@@ -35,10 +35,13 @@ int main()
     // Triangle color (is set from color picker and is passed to shader as a uniform)
     glm::vec3 triangleColor(0.0f, 1.0f, 0.0f);
     
-    float triangle[] = {
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f, 0.5f, 0.0f};
+    float triangle[] = 
+    {
+        // coordinates       |        color
+        -0.5f, -0.5f, 0.0f,     1.0f, 0.0f, 0.0f,
+        0.5f , -0.5f, 0.0f,     0.0f, 1.0f, 0.0f,
+        0.0f , 0.5f , 0.0f,     0.0f, 0.0f, 1.0f,
+    };
 
     // VAO, VBO
     VAO VAO1;
@@ -46,7 +49,8 @@ int main()
     VBO VBO1(triangle, sizeof(triangle));
     VBO1.bind();
 
-    VAO1.linkAttrib(VBO1, 0, 3, GL_FLOAT, 3 * sizeof(float), (void *)0);
+    VAO1.linkAttrib(VBO1, 0, 3, GL_FLOAT, 6 * sizeof(float), (void *)0); // coordinates
+    VAO1.linkAttrib(VBO1, 1, 3, GL_FLOAT, 6 * sizeof(float), (void *)(3 * sizeof(float))); // color
 
     // Unbind stuff
     VBO1.unbind();
