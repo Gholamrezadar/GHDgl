@@ -90,7 +90,7 @@ void MyGUI3::update(Shader& flatTextureShader)
 
 void MyGUI3::log(std::string message)
 {
-    logs.push_back(message);
+    logs.insert(logs.begin(), message);
 }
 
 void MyGUI3::cleanup()
