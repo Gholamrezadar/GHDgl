@@ -45,26 +45,35 @@ $ ./GHDgl
 
 
 
-1. GUI Update
+8. GUI Update
+
+Refactored GUI code into a GUI class
 ![gui_update](demos/gui_update.png)
 
 7. Rotated Cube
+
 ![rotated_cube](demos/rotated_cube.png)
 
 6. Cube
+
 ![cube](demos/cube.png)
 
 5. MVP Matrices
+
 ![mvp](demos/MVP.png)
 
 4. Texture mixed with color
+
 ![texture_mixed](demos/texture_mixed.png)
 
 3. Simple Texture
+
 ![texture](demos/texture.png)
 
 2. Square with EBO
+
 ![square_ebo](demos/square_ebo.png)
 
 1. Triangle with vertex color
+
 ![tricolor_triangle](demos/tricolor_triangle.png)
