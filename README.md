@@ -45,6 +45,9 @@ $ ./GHDgl
 
 
 
+8. GUI Update
+![gui_update](demos/gui_update.png)
+
 7. Rotated Cube
 ![rotated_cube](demos/rotated_cube.png)
 

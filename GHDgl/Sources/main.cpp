@@ -1,3 +1,5 @@
+#define GLAD_GL_IMPLEMENTATION
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -17,9 +19,10 @@
 #include "VBO.h"
 #include "EBO.h"
 #include "utils.h"
+#include "mygui.h"
 
-const int scr_width = 800;
-const int scr_height = 800;
+const int SCR_WIDTH = 800;
+const int SCR_HEIGHT = 800;
 
 
 void processInput(GLFWwindow *window)
@@ -33,7 +36,7 @@ int main()
     // Initialization and GLFW window creation
     GLFWwindow* window;
     int flag;
-    flag = initialization(window, scr_width, scr_height, "GHDgl");
+    flag = initialization(window, SCR_WIDTH, SCR_HEIGHT, "GHDgl");
     if (flag == -1)
         return flag;
 
@@ -49,7 +52,7 @@ int main()
     view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f)); 
 
     glm::mat4 projection;
-    projection = glm::perspective(glm::radians(45.0f), (float)scr_height / (float)scr_width, 0.1f, 100.0f);
+    projection = glm::perspective(glm::radians(45.0f), (float)SCR_HEIGHT / (float)SCR_WIDTH, 0.1f, 100.0f);
 
 
     // Transformed textured shader
@@ -152,13 +155,10 @@ int main()
     const char* image_address = "Images/container.jpg";
     Texturee container_texture(image_address, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
 
+    MyGUI3 gui;
+
     // Main loop
     int frameNumber = 0;
-    static float angle = 0.0f;
-    
-    // create a backup of model matrix
-    glm::mat4 modelBackup = model;
-
 
     while (!glfwWindowShouldClose(window))
     {
@@ -172,6 +172,7 @@ int main()
 
         // Clear background
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+        // gui.log("glClearColor");
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Render The Mesh
@@ -182,32 +183,11 @@ int main()
         VBO1.bind();
         // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glDrawArrays(GL_TRIANGLES, 0, 36);
+        // gui.log("Draw");
 
         //////////////////////////////////// UI ////////////////////////////////////
 
-        // Start the ImGui frame
-        ImGuiNewFrame();
-
-        // Color picker
-        ImGui::Begin("Color Picker");
-        if (ImGui::ColorPicker3("Shader Color", glm::value_ptr(triangleColor)))
-        {
-            flatTextureShader.uniform_3f("color", triangleColor.r, triangleColor.g, triangleColor.b);
-        }
-        ImGui::End();
-
-        // a float slider that controls model rotation angle
-        ImGui::Begin("Model Rotation");
-
-        if (ImGui::SliderFloat("Angle", &angle, 0.0f, 360.0f))
-        {
-            model = glm::rotate(modelBackup, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
-            flatTextureShader.uniform_mat4("model", glm::value_ptr(model));
-        }
-        ImGui::End();
-
-        // Render ImGui
-        ImGui::Render(); ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        gui.update(flatTextureShader);
 
         // Check and call events and swap the buffers
         glfwSwapBuffers(window);
@@ -222,7 +202,8 @@ int main()
     VBO1.remove();
     flatTextureShader.remove();
     container_texture.remove();
-    ImGuiCleanup();
+    gui.cleanup();
+    
     glfwTerminate();
 
     return 0;
