@@ -22,8 +22,8 @@
 #include "mygui.h"
 
 #include "Camera.h"
-const int SCR_WIDTH = 800;
-const int SCR_HEIGHT = 800;
+const int SCR_WIDTH = 1280;
+const int SCR_HEIGHT = 720;
 
 
 void processInput(GLFWwindow *window)
@@ -60,13 +60,18 @@ int main()
     Camera camera(SCR_WIDTH, SCR_HEIGHT, glm::vec3(0.0f, 0.0f, 3.0f), 45.0f, 0.1f, 100.0f);
 
     // Transformed textured shader
-    Shader flatTextureShader("Shaders/flatTextureShader.vert", "Shaders/flatTextureShader.frag");
+    Shader flatTextureShader("Shaders/phongShader.vert", "Shaders/phongShader.frag");
     flatTextureShader.use();
     flatTextureShader.uniform_3f("color", 0.0f, 1.0f, 0.0f);
     flatTextureShader.uniform_1f("texture1", 0);
     flatTextureShader.uniform_mat4("model", glm::value_ptr(model));
     // flatTextureShader.uniform_mat4("view", glm::value_ptr(view));
     // flatTextureShader.uniform_mat4("projection", glm::value_ptr(projection));
+
+    // lighting
+    flatTextureShader.uniform_1f("lightIntensity", 0.0f);
+    flatTextureShader.uniform_3f("lightPos", 0.0f, 2.0f, 0.0f);
+    flatTextureShader.uniform_3f("lightColor", 1.0f, 1.0f, 1.0f);
 
     camera.Matrix(flatTextureShader);
 
@@ -98,48 +103,48 @@ int main()
     };
 
     float cube[] = {
-        // positions          // colors           // texture coords
-        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,
+        // positions          // colors           // texture coords // normals
+        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,        0.0f,  0.0f, -1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,        0.0f,  0.0f, -1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,        0.0f,  0.0f, -1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,        0.0f,  0.0f, -1.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,        0.0f,  0.0f, -1.0f,
+        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,        0.0f,  0.0f, -1.0f,
 
-        -0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,        0.0f,  0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,        0.0f,  0.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,        0.0f,  0.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,        0.0f,  0.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,        0.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,        0.0f,  0.0f, 1.0f,
 
-        -0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,        1.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,        1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,        1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,        1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,        1.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,        1.0f,  0.0f,  0.0f,
 
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,        1.0f,  0.0f,  0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,        1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,        1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,        1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,        1.0f,  0.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,        1.0f,  0.0f,  0.0f,
 
-        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,        0.0f, -1.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,        0.0f, -1.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,        0.0f, -1.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,        0.0f, -1.0f,  0.0f,
+        -0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,        0.0f, -1.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,        0.0f, -1.0f,  0.0f,
 
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,        0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,        0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,        0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,        0.0f,  1.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,        0.0f,  1.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,        0.0f,  1.0f,  0.0f
     };
 
     // Mesh
@@ -148,9 +153,10 @@ int main()
     VBO VBO1(cube, sizeof(cube));
     // EBO EBO1(square_indices, sizeof(square_indices));
 
-    VAO1.linkAttrib(0, 3, GL_FLOAT, 8 * sizeof(float), (void *)0); // coordinates
-    VAO1.linkAttrib(1, 3, GL_FLOAT, 8 * sizeof(float), (void *)(3 * sizeof(float))); // color
-    VAO1.linkAttrib(2, 2, GL_FLOAT, 8 * sizeof(float), (void *)(6 * sizeof(float))); // tex coords
+    VAO1.linkAttrib(0, 3, GL_FLOAT, 11 * sizeof(float), (void *)0); // coordinates
+    VAO1.linkAttrib(1, 3, GL_FLOAT, 11 * sizeof(float), (void *)(3 * sizeof(float))); // color
+    VAO1.linkAttrib(2, 2, GL_FLOAT, 11 * sizeof(float), (void *)(6 * sizeof(float))); // tex coords
+    VAO1.linkAttrib(3, 3, GL_FLOAT, 11 * sizeof(float), (void *)(8 * sizeof(float))); // normals
 
     // Unbind stuff
     VBO1.unbind();

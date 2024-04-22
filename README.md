@@ -43,6 +43,11 @@ $ ./GHDgl
 
 ## Demos
 
+9. Normal
+
+Added normal vector to the vertex data and implemented simple normal debugger shader.
+![normal](demos/normal.png)
+
 8. Camera
 
 Added camera class and implemented camera movement using keyboard and mouse input.
