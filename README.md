@@ -43,6 +43,11 @@ $ ./GHDgl
 
 ## Demos
 
+10. Diffuse Lighting
+
+Implemented simple diffuse lighting using Phong reflection model.
+![diffuse](demos/diffuse.png)
+
 9. Normal
 
 Added normal vector to the vertex data and implemented simple normal debugger shader.

@@ -12,6 +12,7 @@ uniform sampler2D texture1;
 in vec3 vertexColor;
 in vec2 TexCoord;
 in vec3 normal;
+in vec3 fragPos;
 
 void main()
 {
@@ -21,6 +22,11 @@ void main()
     vec3 ambient = ambientStrength * lightColor;
 
     vec3 result = ambient * color;
-    // FragColor = vec4(result, 1.0f);
-    FragColor = vec4(normal, 1.0f);
+    vec3 norm = normalize(normal);
+    vec3 lightDir = normalize(lightPos - fragPos);
+    float diff = max(dot(norm, lightDir), 0.0);
+    vec3 diffuse = diff * lightColor;
+    result = (ambient + diffuse) * color;
+
+    FragColor = vec4(result, 1.0f);
 }

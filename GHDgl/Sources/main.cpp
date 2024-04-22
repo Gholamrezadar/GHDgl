@@ -47,7 +47,7 @@ int main()
     glm::mat4 model = glm::mat4(1.0f);
 
     // 55 degree rotation along x-axis
-    model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f)); 
+    model = glm::rotate(model, glm::radians(55.0f), glm::vec3(1.0f, 0.0f, 0.0f)); 
 
     glm::mat4 view = glm::mat4(1.0f);
     // note that we're translating the scene in the reverse direction of where we want to move
@@ -70,7 +70,7 @@ int main()
 
     // lighting
     flatTextureShader.uniform_1f("lightIntensity", 0.0f);
-    flatTextureShader.uniform_3f("lightPos", 0.0f, 2.0f, 0.0f);
+    flatTextureShader.uniform_3f("lightPos", 3.0f, 3.0f, 12.0f);
     flatTextureShader.uniform_3f("lightColor", 1.0f, 1.0f, 1.0f);
 
     camera.Matrix(flatTextureShader);
