@@ -43,7 +43,10 @@ $ ./GHDgl
 
 ## Demos
 
+8. Camera
 
+Added camera class and implemented camera movement using keyboard and mouse input.
+![camera](demos/camera.png)
 
 8. GUI Update
 

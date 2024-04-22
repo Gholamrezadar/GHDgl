@@ -7,6 +7,8 @@
 #include<sstream>
 #include<iostream>
 #include<cerrno>
+#include <glm/glm.hpp> // Include the appropriate header file for the "glm" library
+
 
 std::string get_file_contents(const char* filename);
 
@@ -39,6 +41,7 @@ public:
 
 	// sets a 4D matrix
 	void uniform_mat4(const char* name, float* mat4);
+	void uniform_mat4fv(const char* name, const glm::f32* mat4);
 
 private:
 	// Checks if the different Shaders have compiled properly

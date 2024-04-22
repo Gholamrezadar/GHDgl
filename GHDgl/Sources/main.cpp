@@ -21,6 +21,7 @@
 #include "utils.h"
 #include "mygui.h"
 
+#include "Camera.h"
 const int SCR_WIDTH = 800;
 const int SCR_HEIGHT = 800;
 
@@ -55,6 +56,8 @@ int main()
     glm::mat4 projection;
     projection = glm::perspective(glm::radians(45.0f), (float)SCR_HEIGHT / (float)SCR_WIDTH, 0.1f, 100.0f);
 
+    // Camera
+    Camera camera(SCR_WIDTH, SCR_HEIGHT, glm::vec3(0.0f, 0.0f, 3.0f), 45.0f, 0.1f, 100.0f);
 
     // Transformed textured shader
     Shader flatTextureShader("Shaders/flatTextureShader.vert", "Shaders/flatTextureShader.frag");
@@ -62,8 +65,10 @@ int main()
     flatTextureShader.uniform_3f("color", 0.0f, 1.0f, 0.0f);
     flatTextureShader.uniform_1f("texture1", 0);
     flatTextureShader.uniform_mat4("model", glm::value_ptr(model));
-    flatTextureShader.uniform_mat4("view", glm::value_ptr(view));
-    flatTextureShader.uniform_mat4("projection", glm::value_ptr(projection));
+    // flatTextureShader.uniform_mat4("view", glm::value_ptr(view));
+    // flatTextureShader.uniform_mat4("projection", glm::value_ptr(projection));
+
+    camera.Matrix(flatTextureShader);
 
     // Triangle color (is set from color picker and is passed to shader as a uniform)
     glm::vec3 triangleColor(1.0f, 1.0f, 1.0f);
@@ -168,6 +173,8 @@ int main()
         /////////////////////////////////// Input ///////////////////////////////////
 
         processInput(window);
+        camera.Inputs(window);
+        camera.Matrix(flatTextureShader);
 
         /////////////////////////////////// Draw ///////////////////////////////////
 

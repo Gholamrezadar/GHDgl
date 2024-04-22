@@ -1,5 +1,4 @@
 #include "shader.h"
-
 // Reads a text file and outputs a string with everything in the text file
 std::string get_file_contents(const char* filename)
 {
@@ -16,8 +15,6 @@ std::string get_file_contents(const char* filename)
 		std::cout<<"> Shader read: "<<contents<<"\n";
 	}
 	throw(errno);
-
-	
 }
 
 Shader::Shader(const char* vertexFile, const char* fragmentFile)
@@ -114,6 +111,15 @@ void Shader::uniform_4f(const char *name, float v0, float v1, float v2, float v3
 }
 
 void Shader::uniform_mat4(const char *name, float *mat4)
+{
+	int UniformLocation = glGetUniformLocation(id, name);
+	glUseProgram(id);
+	glUniformMatrix4fv(UniformLocation, 1, GL_FALSE, mat4);
+}
+
+#include <glm/glm.hpp> // Include the appropriate header file for the "glm" library
+
+void Shader::uniform_mat4fv(const char *name, const glm::f32* mat4) // Remove the global-scope qualifier "::"
 {
 	int UniformLocation = glGetUniformLocation(id, name);
 	glUseProgram(id);
