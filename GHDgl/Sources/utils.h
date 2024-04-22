@@ -16,6 +16,8 @@ void ColorPickerCallback(const ImVec4 &color, void *userData);
 
 int initialization(GLFWwindow*& window, int width, int height, const char* title);
 
+void embraceTheDarkness();
+
 ImGuiIO& initializeImGui(GLFWwindow* window);
 
 void ImGuiNewFrame();
