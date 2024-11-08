@@ -61,14 +61,16 @@ target_link_libraries(${PROJECT_NAME} PRIVATE glad stb_image glfw ${GLFW_LIBRARI
 
 # Copy Shaders into the build directory
 add_custom_command(
-    TARGET ${PROJECT_NAME} POST_BUILD
+    TARGET ${PROJECT_NAME} PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/Shaders $<TARGET_FILE_DIR:${PROJECT_NAME}>/Shaders
-    DEPENDS ${PROJECT_SHADERS})
+    DEPENDS ${PROJECT_SHADERS}
+)
 
 # Copy Images into the build directory
 add_custom_command(
-    TARGET ${PROJECT_NAME} POST_BUILD
+    TARGET ${PROJECT_NAME} PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/Media/ $<TARGET_FILE_DIR:${PROJECT_NAME}>
-    DEPENDS ${PROJECT_IMAGES})
+    DEPENDS ${PROJECT_IMAGES}
+)
 
 
