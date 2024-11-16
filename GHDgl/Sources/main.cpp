@@ -58,7 +58,13 @@ int main()
     light_model = glm::scale(light_model, glm::vec3(lightScale, lightScale, lightScale));
 
     // Camera
-    Camera camera(SCR_WIDTH, SCR_HEIGHT, glm::vec3(0.0f, 0.0f, 3.0f), 45.0f, 0.1f, 100.0f);
+    Camera camera(SCR_WIDTH, SCR_HEIGHT, glm::vec3(0.0f, 0.0f, 0.0f), 45.0f, 0.1f, 100.0f);
+    // camera.Position += glm::vec3(0.0f, 0.0f, 3.0f);
+    camera.Position += glm::vec3(1.5f, 1.5f, 1.5f);
+    camera.Position += glm::vec3(0.0f, -0.35f, 0.0f);
+    camera.Orientation = glm::rotate(camera.Orientation, glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    camera.Orientation = glm::rotate(camera.Orientation, glm::radians(-45.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    // look at the light
 
     // Box Shader
     Shader currentShader("Shaders/phongShader.vert", "Shaders/phongShader.frag");
@@ -68,9 +74,18 @@ int main()
     currentShader.uniform_mat4("model", glm::value_ptr(model));
     currentShader.uniform_3f("viewPos", camera.Position.x, camera.Position.y, camera.Position.z);
     currentShader.uniform_1f("lightIntensity", 1.0f);
-    // currentShader.uniform_3f("lightPos", 0.6f, 0.6f, 0.6f); // corner light
     currentShader.uniform_3f("lightPos", lightPos.x, lightPos.y, lightPos.z); // top light
     currentShader.uniform_3f("lightColor", 1.0f, 1.0f, 1.0f);
+
+    // Material settings
+    currentShader.uniform_3f("material.ambient", 1.0f, 0.5f, 0.31f);
+    currentShader.uniform_3f("material.diffuse", 1.0f, 0.5f, 0.31f);
+    currentShader.uniform_3f("material.specular", 0.5f, 0.5f, 0.5f);
+    currentShader.uniform_1f("material.shininess", 32.0f);
+    currentShader.uniform_3f("light.ambient",  0.4f, 0.4f, 0.4f);
+    currentShader.uniform_3f("light.diffuse",  0.85f, 0.85f, 0.85f);
+    currentShader.uniform_3f("light.specular", 1.0f, 1.0f, 1.0f);
+
     camera.Matrix(currentShader); // this is what moves your object
 
     // light Shader (basic white color shader)

@@ -43,6 +43,11 @@ $ ./GHDgl
 
 ## Demos
 
+12. Materials
+
+Refactored the shader properties into a Material and Light struct in the fragment shader.
+![material](demos/material.png)
+
 11. Specular Lighting
 
 Implemented Specular lighting using Phong lighting model and visualized the light using a second small cube.
