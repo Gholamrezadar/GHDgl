@@ -37,6 +37,7 @@ Texturee::Texturee(const char* image, unsigned int texType, unsigned int slot, u
 
 	// Assigns the image to the OpenGL Texture object
 	glTexImage2D(texType, 0, format, widthImg, heightImg, 0, format, pixelType, bytes);
+
 	// Generates MipMaps
 	glGenerateMipmap(texType);
 

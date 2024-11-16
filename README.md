@@ -43,6 +43,12 @@ $ ./GHDgl
 
 ## Demos
 
+13. Texture Maps
+
+Diffuse and Specular Texture Maps!
+![texture_maps](demos/texture_specular.png)
+
+
 12. Materials
 
 Refactored the shader properties into a Material and Light struct in the fragment shader.

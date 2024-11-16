@@ -78,6 +78,12 @@ void Shader::remove()
 	glDeleteProgram(id);
 }
 
+void Shader::uniform_int(const char *name, int v0) {
+	int colorUniformLocation = glGetUniformLocation(id, name);
+	glUseProgram(id);
+	glUniform1i(colorUniformLocation, v0);
+}
+
 // Sets a 1f uniform
 void Shader::uniform_1f(const char *name, int v0)
 {

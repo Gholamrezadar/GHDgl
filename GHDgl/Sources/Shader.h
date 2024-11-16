@@ -27,6 +27,9 @@ public:
 	// Deletes the Shader Program
 	void remove();
 
+	// Sets a 1i uniform
+	void uniform_int(const char* name, int v0);
+
     // Sets a 1f uniform
     void uniform_1f(const char* name, int v0);
 

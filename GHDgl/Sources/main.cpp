@@ -37,7 +37,7 @@ int main()
     // Initialization and GLFW window creation
     GLFWwindow* window;
     int flag;
-    flag = initialization(window, SCR_WIDTH, SCR_HEIGHT, "GHDgl sssd");
+    flag = initialization(window, SCR_WIDTH, SCR_HEIGHT, "GHDgl ffddldf");
     if (flag == -1)
         return flag;
 
@@ -50,7 +50,7 @@ int main()
     // model = glm::rotate(model, glm::radians(30.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     // light matrix
-    glm::vec3 lightPos = glm::vec3(0.0f, 0.55f, 0.0f);
+    glm::vec3 lightPos = glm::vec3(0.45, 0.55f, 0.0f);
     glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
     glm::mat4 light_model = glm::mat4(1.0f);
     float lightScale = 0.03f;
@@ -67,10 +67,10 @@ int main()
     // look at the light
 
     // Box Shader
-    Shader currentShader("Shaders/phongShader.vert", "Shaders/phongShader.frag");
+    Shader currentShader("Shaders/texturedPhongShader.vert", "Shaders/texturedPhongShader.frag");
     currentShader.use();
     currentShader.uniform_3f("color", 0.0f, 1.0f, 0.0f);
-    currentShader.uniform_1f("texture1", 0);
+    // currentShader.uniform_1f("texture1", 0);
     currentShader.uniform_mat4("model", glm::value_ptr(model));
     currentShader.uniform_3f("viewPos", camera.Position.x, camera.Position.y, camera.Position.z);
     currentShader.uniform_1f("lightIntensity", 1.0f);
@@ -79,9 +79,9 @@ int main()
 
     // Material settings
     currentShader.uniform_3f("material.ambient", 1.0f, 0.5f, 0.31f);
-    currentShader.uniform_3f("material.diffuse", 1.0f, 0.5f, 0.31f);
-    currentShader.uniform_3f("material.specular", 0.5f, 0.5f, 0.5f);
-    currentShader.uniform_1f("material.shininess", 32.0f);
+    currentShader.uniform_int("material.diffuse", 0); // set to texture unit 0
+    currentShader.uniform_int("material.specular", 1);
+    currentShader.uniform_1f("material.shininess", 64.0f);
     currentShader.uniform_3f("light.ambient",  0.4f, 0.4f, 0.4f);
     currentShader.uniform_3f("light.diffuse",  0.85f, 0.85f, 0.85f);
     currentShader.uniform_3f("light.specular", 1.0f, 1.0f, 1.0f);
@@ -157,8 +157,11 @@ int main()
     VAO1.unbind();
 
     // Texture
-    const char* image_address = "Images/container.jpg";
-    Texturee container_texture(image_address, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
+    const char* container2_image_address = "Images/container2.png";
+    Texturee container_texture(container2_image_address, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+
+    const char* container2_specular_image_address = "Images/container2_specular.png";
+    Texturee container_specular_texture(container2_specular_image_address, GL_TEXTURE_2D, GL_TEXTURE1, GL_RGBA, GL_UNSIGNED_BYTE);
 
     MyGUI3 gui;
 
@@ -184,7 +187,10 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Render The Mesh
-        container_texture.bind();
+        // container_texture3.bind();
+        // container_texture2.bind();
+        container_texture.bind(GL_TEXTURE0);
+        container_specular_texture.bind(GL_TEXTURE1);
         currentShader.use();
         VAO1.bind();
         // EBO1.bind();
@@ -215,6 +221,7 @@ int main()
     VBO1.remove();
     currentShader.remove();
     container_texture.remove();
+    container_specular_texture.remove();
     gui.cleanup();
     
     glfwTerminate();
