@@ -34,16 +34,18 @@ public:
     int height;
 
     // Adjust the speed of the camera and it's sensitivity when looking around
-    const float NORMAL_SPEED = 0.1f/16.0f;
-    const float SLOW_SPEED = 0.1f/100.0f;
+    const float NORMAL_SPEED = 0.1f/8.0f;
+    const float SLOW_SPEED = 0.1f/66.0f;
     float speed = NORMAL_SPEED;
-    float sensitivity = 100.0f/4.0f;
+    float sensitivity = 100.0f/2.0f;
 
     // Camera constructor to set up initial values
     Camera(int width, int height, glm::vec3 position, float FOV, float nearPlane, float farPlane);
 
     // Updates and exports the camera matrix to the Vertex Shader
     void Matrix(Shader &shader);
+
+    void UpdatePositionInShader(Shader &shader);
 
     // Handles camera inputs
     void Inputs(GLFWwindow *window);

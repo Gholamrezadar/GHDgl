@@ -37,7 +37,7 @@ int main()
     // Initialization and GLFW window creation
     GLFWwindow* window;
     int flag;
-    flag = initialization(window, SCR_WIDTH, SCR_HEIGHT, "GHDgl");
+    flag = initialization(window, SCR_WIDTH, SCR_HEIGHT, "GHDgl sssd");
     if (flag == -1)
         return flag;
 
@@ -47,7 +47,8 @@ int main()
     glm::mat4 model = glm::mat4(1.0f);
 
     // 55 degree rotation along x-axis
-    model = glm::rotate(model, glm::radians(55.0f), glm::vec3(1.0f, 0.0f, 0.0f)); 
+    // model = glm::rotate(model, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    // model = glm::rotate(model, glm::radians(30.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     glm::mat4 view = glm::mat4(1.0f);
     // note that we're translating the scene in the reverse direction of where we want to move
@@ -59,26 +60,28 @@ int main()
     // Camera
     Camera camera(SCR_WIDTH, SCR_HEIGHT, glm::vec3(0.0f, 0.0f, 3.0f), 45.0f, 0.1f, 100.0f);
 
-    // Transformed textured shader
-    Shader flatTextureShader("Shaders/phongShader.vert", "Shaders/phongShader.frag");
-    flatTextureShader.use();
-    flatTextureShader.uniform_3f("color", 0.0f, 1.0f, 0.0f);
-    flatTextureShader.uniform_1f("texture1", 0);
-    flatTextureShader.uniform_mat4("model", glm::value_ptr(model));
+    //  shader
+    Shader currentShader("Shaders/phongShader.vert", "Shaders/phongShader.frag");
+    currentShader.use();
+    currentShader.uniform_3f("color", 0.0f, 1.0f, 0.0f);
+    currentShader.uniform_1f("texture1", 0);
+    currentShader.uniform_mat4("model", glm::value_ptr(model));
+    currentShader.uniform_3f("viewPos", camera.Position.x, camera.Position.y, camera.Position.z);
     // flatTextureShader.uniform_mat4("view", glm::value_ptr(view));
     // flatTextureShader.uniform_mat4("projection", glm::value_ptr(projection));
 
     // lighting
-    flatTextureShader.uniform_1f("lightIntensity", 0.0f);
-    flatTextureShader.uniform_3f("lightPos", 3.0f, 3.0f, 12.0f);
-    flatTextureShader.uniform_3f("lightColor", 1.0f, 1.0f, 1.0f);
+    currentShader.uniform_1f("lightIntensity", 1.0f);
+    // currentShader.uniform_3f("lightPos", 1.0f, 1.0f, 1.0f); // corner light
+    currentShader.uniform_3f("lightPos", 0.0f, 0.55f, 0.0f); // top light
+    currentShader.uniform_3f("lightColor", 1.0f, 1.0f, 1.0f);
 
-    camera.Matrix(flatTextureShader);
+    camera.Matrix(currentShader);
 
     // Triangle color (is set from color picker and is passed to shader as a uniform)
     glm::vec3 triangleColor(1.0f, 1.0f, 1.0f);
-    
-    float triangle[] = 
+
+    float triangle[] =
     {
         // coordinates       |        color
         -0.5f, -0.5f, 0.0f,     1.0f, 0.0f, 0.0f,
@@ -178,7 +181,9 @@ int main()
 
         processInput(window);
         camera.Inputs(window);
-        camera.Matrix(flatTextureShader);
+        camera.Matrix(currentShader);
+        camera.UpdatePositionInShader(currentShader);
+        gui.log("Camera position: " + std::to_string(camera.Position.x) + " " + std::to_string(camera.Position.y) + " " + std::to_string(camera.Position.z));
 
         /////////////////////////////////// Draw ///////////////////////////////////
 
@@ -189,7 +194,7 @@ int main()
 
         // Render The Mesh
         container_texture.bind();
-        flatTextureShader.use();
+        currentShader.use();
         VAO1.bind();
         // EBO1.bind();
         VBO1.bind();
@@ -199,20 +204,20 @@ int main()
 
         //////////////////////////////////// UI ////////////////////////////////////
 
-        gui.update(flatTextureShader);
+        gui.update(currentShader);
 
         // Check and call events and swap the buffers
         glfwSwapBuffers(window);
         glfwPollEvents();
 
         frameNumber++;
-    
+
     } // Main loop end
 
     // Cleanup and terminate
     VAO1.remove();
     VBO1.remove();
-    flatTextureShader.remove();
+    currentShader.remove();
     container_texture.remove();
     gui.cleanup();
     

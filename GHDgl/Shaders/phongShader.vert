@@ -13,7 +13,7 @@ uniform mat4 model;
 // uniform mat4 view;
 // uniform mat4 projection;
 
-uniform mat4 matrix;
+uniform mat4 matrix; // Combines projection * view from the camera
 
 void main()
 {
