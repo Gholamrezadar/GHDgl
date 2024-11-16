@@ -43,9 +43,14 @@ $ ./GHDgl
 
 ## Demos
 
+11. Specular Lighting
+
+Implemented Specular lighting using Phong lighting model and visualized the light using a second small cube.
+![specular](demos/specular.png)
+
 10. Diffuse Lighting
 
-Implemented simple diffuse lighting using Phong reflection model.
+Implemented simple diffuse lighting using Phong lighting model.
 ![diffuse](demos/diffuse.png)
 
 9. Normal

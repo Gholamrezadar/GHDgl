@@ -43,67 +43,42 @@ int main()
 
     ///////////////////////////// Scene Setup /////////////////////////////
 
-    // MVP matrices
+    // Model matrix
     glm::mat4 model = glm::mat4(1.0f);
-
     // 55 degree rotation along x-axis
     // model = glm::rotate(model, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     // model = glm::rotate(model, glm::radians(30.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    glm::mat4 view = glm::mat4(1.0f);
-    // note that we're translating the scene in the reverse direction of where we want to move
-    view = glm::translate(view, glm::vec3(0.0f, 1.0f, -3.0f)); 
-
-    glm::mat4 projection;
-    projection = glm::perspective(glm::radians(45.0f), (float)SCR_HEIGHT / (float)SCR_WIDTH, 0.1f, 100.0f);
+    // light matrix
+    glm::vec3 lightPos = glm::vec3(0.0f, 0.55f, 0.0f);
+    glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
+    glm::mat4 light_model = glm::mat4(1.0f);
+    float lightScale = 0.03f;
+    light_model = glm::translate(light_model, lightPos);
+    light_model = glm::scale(light_model, glm::vec3(lightScale, lightScale, lightScale));
 
     // Camera
     Camera camera(SCR_WIDTH, SCR_HEIGHT, glm::vec3(0.0f, 0.0f, 3.0f), 45.0f, 0.1f, 100.0f);
 
-    //  shader
+    // Box Shader
     Shader currentShader("Shaders/phongShader.vert", "Shaders/phongShader.frag");
     currentShader.use();
     currentShader.uniform_3f("color", 0.0f, 1.0f, 0.0f);
     currentShader.uniform_1f("texture1", 0);
     currentShader.uniform_mat4("model", glm::value_ptr(model));
     currentShader.uniform_3f("viewPos", camera.Position.x, camera.Position.y, camera.Position.z);
-    // flatTextureShader.uniform_mat4("view", glm::value_ptr(view));
-    // flatTextureShader.uniform_mat4("projection", glm::value_ptr(projection));
-
-    // lighting
     currentShader.uniform_1f("lightIntensity", 1.0f);
-    // currentShader.uniform_3f("lightPos", 1.0f, 1.0f, 1.0f); // corner light
-    currentShader.uniform_3f("lightPos", 0.0f, 0.55f, 0.0f); // top light
+    // currentShader.uniform_3f("lightPos", 0.6f, 0.6f, 0.6f); // corner light
+    currentShader.uniform_3f("lightPos", lightPos.x, lightPos.y, lightPos.z); // top light
     currentShader.uniform_3f("lightColor", 1.0f, 1.0f, 1.0f);
+    camera.Matrix(currentShader); // this is what moves your object
 
-    camera.Matrix(currentShader);
-
-    // Triangle color (is set from color picker and is passed to shader as a uniform)
-    glm::vec3 triangleColor(1.0f, 1.0f, 1.0f);
-
-    float triangle[] =
-    {
-        // coordinates       |        color
-        -0.5f, -0.5f, 0.0f,     1.0f, 0.0f, 0.0f,
-        0.5f , -0.5f, 0.0f,     0.0f, 1.0f, 0.0f,
-        0.0f , 0.5f , 0.0f,     0.0f, 0.0f, 1.0f,
-    };
-
-    // Vertices coordinates
-    GLfloat square[] =
-    { //     COORDINATES     /        COLORS      /   TexCoord  //
-        -0.5f, -0.5f, 0.0f,     1.0f, 0.0f, 0.0f,	0.0f, 0.0f, // Lower left corner
-        -0.5f,  0.5f, 0.0f,     0.0f, 1.0f, 0.0f,	0.0f, 1.0f, // Upper left corner
-        0.5f,  0.5f, 0.0f,     0.0f, 0.0f, 1.0f,	1.0f, 1.0f, // Upper right corner
-        0.5f, -0.5f, 0.0f,     1.0f, 1.0f, 1.0f,	1.0f, 0.0f  // Lower right corner
-    };
-
-    // Indices for vertices order
-    GLuint square_indices[] =
-    {
-        0, 2, 1, // Upper triangle
-        0, 3, 2 // Lower triangle
-    };
+    // light Shader (basic white color shader)
+    Shader lightShader("Shaders/flatShader.vert", "Shaders/flatShader.frag");
+    lightShader.use();
+    lightShader.uniform_3f("color", lightColor.x, lightColor.y, lightColor.z);
+    lightShader.uniform_mat4("model", glm::value_ptr(light_model));
+    camera.Matrix(lightShader);
 
     float cube[] = {
         // positions          // colors           // texture coords // normals
@@ -182,6 +157,7 @@ int main()
         processInput(window);
         camera.Inputs(window);
         camera.Matrix(currentShader);
+        camera.Matrix(lightShader);
         camera.UpdatePositionInShader(currentShader);
         gui.log("Camera position: " + std::to_string(camera.Position.x) + " " + std::to_string(camera.Position.y) + " " + std::to_string(camera.Position.z));
 
@@ -201,6 +177,11 @@ int main()
         // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         // gui.log("Draw");
+
+        // Render the light
+        lightShader.use();
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
 
         //////////////////////////////////// UI ////////////////////////////////////
 
