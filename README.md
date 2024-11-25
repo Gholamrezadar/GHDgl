@@ -44,10 +44,12 @@ $ ./GHDgl
 ## Demos
 
 15. Light Attenuation
+
 Implemented light attenuation.
 ![light_attenuation](demos/light_attenuation.png)
 
 14. Multiple Cubes
+
 Render multiple cubes in a grid.
 ![multiple_cubes](demos/multiple_cubes.png)
 
