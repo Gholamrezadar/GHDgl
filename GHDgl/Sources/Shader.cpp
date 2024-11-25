@@ -85,11 +85,19 @@ void Shader::uniform_int(const char *name, int v0) {
 }
 
 // Sets a 1f uniform
-void Shader::uniform_1f(const char *name, int v0)
+void Shader::uniform_1f(const char *name, float v0)
 {
     int colorUniformLocation = glGetUniformLocation(id, name);
     glUseProgram(id);
     glUniform1f(colorUniformLocation, v0);
+}
+
+// Sets a bool uniform
+void Shader::uniform_bool(const char *name, bool v0)
+{
+	int colorUniformLocation = glGetUniformLocation(id, name);
+	glUseProgram(id);
+	glUniform1i(colorUniformLocation, v0);
 }
 
 // Sets a 2f uniform

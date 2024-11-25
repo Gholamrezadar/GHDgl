@@ -31,7 +31,10 @@ public:
 	void uniform_int(const char* name, int v0);
 
     // Sets a 1f uniform
-    void uniform_1f(const char* name, int v0);
+    void uniform_1f(const char* name, float v0);
+
+	// Sets a bool uniform
+	void uniform_bool(const char* name, bool v0);
 
     // Sets a 2f uniform
     void uniform_2f(const char* name, float v0, float v1);

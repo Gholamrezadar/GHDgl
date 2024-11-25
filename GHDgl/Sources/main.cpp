@@ -73,9 +73,15 @@ int main()
     // currentShader.uniform_1f("texture1", 0);
     currentShader.uniform_mat4("model", glm::value_ptr(model));
     currentShader.uniform_3f("viewPos", camera.Position.x, camera.Position.y, camera.Position.z);
+
+    // Light settings
     currentShader.uniform_1f("lightIntensity", 1.0f);
     currentShader.uniform_3f("lightPos", lightPos.x, lightPos.y, lightPos.z); // top light
     currentShader.uniform_3f("lightColor", 1.0f, 1.0f, 1.0f);
+    currentShader.uniform_1f("light.constant", 1.0f);
+    currentShader.uniform_1f("light.linear", 0.3f);
+    currentShader.uniform_1f("light.quadratic", 0.44f);
+    currentShader.uniform_bool("isAttenuated", true);
 
     // Material settings
     currentShader.uniform_3f("material.ambient", 1.0f, 0.5f, 0.31f);
@@ -196,7 +202,24 @@ int main()
         // EBO1.bind();
         VBO1.bind();
         // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        // draw one cube in the center of the scene
+        // glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
+        // draw a grid of cubes on the ground
+        float gap = 0.05f;
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                // change the model matrix to move the cube to the correct position
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::translate(model, glm::vec3(i * (1.0f+gap), 0.0f, j * (1.0f+gap)));
+                currentShader.use();
+                currentShader.uniform_mat4("model", glm::value_ptr(model));
+                camera.Matrix(currentShader);
+                glDrawArrays(GL_TRIANGLES, 0, 36);
+            }
+        }
+
         // gui.log("Draw");
 
         // Render the light
