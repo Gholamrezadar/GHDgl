@@ -43,43 +43,43 @@ $ ./GHDgl
 
 ## Demos
 
-15. Light Attenuation
+16. Light Attenuation
 
 Implemented light attenuation.
 ![light_attenuation](demos/light_attenuation.png)
 
-14. Multiple Cubes
+15. Multiple Cubes
 
 Render multiple cubes in a grid.
 ![multiple_cubes](demos/multiple_cubes.png)
 
-13. Texture Maps
+14. Texture Maps
 
 Diffuse and Specular Texture Maps!
 ![texture_maps](demos/texture_specular.png)
 
 
-12. Materials
+13. Materials
 
 Refactored the shader properties into a Material and Light struct in the fragment shader.
 ![material](demos/material.png)
 
-11. Specular Lighting
+12. Specular Lighting
 
 Implemented Specular lighting using Phong lighting model and visualized the light using a second small cube.
 ![specular](demos/specular.png)
 
-10. Diffuse Lighting
+11. Diffuse Lighting
 
 Implemented simple diffuse lighting using Phong lighting model.
 ![diffuse](demos/diffuse.png)
 
-9. Normal
+10. Normal
 
 Added normal vector to the vertex data and implemented simple normal debugger shader.
 ![normal](demos/normal.png)
 
-8. Camera
+9. Camera
 
 Added camera class and implemented camera movement using keyboard and mouse input.
 ![camera](demos/camera.png)
