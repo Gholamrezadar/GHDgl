@@ -25,12 +25,32 @@
 const int SCR_WIDTH = 1280;
 const int SCR_HEIGHT = 720;
 
+const int NR_POINT_LIGHTS = 4;
+
+// timing
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
 
 void processInput(GLFWwindow *window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 }
+
+
+glm::vec3 pointLightPositions[] = {
+    glm::vec3(0.45, 0.55f, 0.0f),
+    glm::vec3(-0.45, 0.55f, 0.0f),
+    glm::vec3(0.0, 0.55f, 0.45f),
+    glm::vec3(0.0, 0.55f, -0.45f),
+};
+
+glm::vec3 pointLightColors[] = {
+    glm::vec3(0.85f, 0.85f, 0.85f), // white
+    glm::vec3(0.85f, 0.1f, 0.1f)*1.0f, // red
+    glm::vec3(0.1f, 0.85f, 0.1f), // green
+    glm::vec3(0.1f, 0.1f, 0.85f), // blue
+};
 
 int main()
 {
@@ -45,17 +65,6 @@ int main()
 
     // Model matrix
     glm::mat4 model = glm::mat4(1.0f);
-    // 55 degree rotation along x-axis
-    // model = glm::rotate(model, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    // model = glm::rotate(model, glm::radians(30.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
-    // light matrix
-    glm::vec3 lightPos = glm::vec3(0.45, 0.55f, 0.0f);
-    glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
-    glm::mat4 light_model = glm::mat4(1.0f);
-    float lightScale = 0.03f;
-    light_model = glm::translate(light_model, lightPos);
-    light_model = glm::scale(light_model, glm::vec3(lightScale, lightScale, lightScale));
 
     // Camera
     Camera camera(SCR_WIDTH, SCR_HEIGHT, glm::vec3(0.0f, 0.0f, 0.0f), 45.0f, 0.1f, 100.0f);
@@ -75,31 +84,48 @@ int main()
     currentShader.uniform_3f("viewPos", camera.Position.x, camera.Position.y, camera.Position.z);
 
     // Light settings
-    currentShader.uniform_1f("lightIntensity", 1.0f);
-    currentShader.uniform_3f("lightPos", lightPos.x, lightPos.y, lightPos.z); // top light
-    currentShader.uniform_3f("lightColor", 1.0f, 1.0f, 1.0f);
-    currentShader.uniform_1f("light.constant", 1.0f);
-    currentShader.uniform_1f("light.linear", 0.3f);
-    currentShader.uniform_1f("light.quadratic", 0.44f);
-    currentShader.uniform_bool("isAttenuated", true);
+    currentShader.uniform_3f("pointLights[0].position", pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
+    currentShader.uniform_1f("pointLights[0].constant", 1.0f);
+    currentShader.uniform_1f("pointLights[0].linear", 0.3f);
+    currentShader.uniform_1f("pointLights[0].quadratic", 0.44f);
+    currentShader.uniform_3f("pointLights[0].ambient",  0.2f, 0.2f, 0.2f);
+    currentShader.uniform_3f("pointLights[0].diffuse",  pointLightColors[0].x, pointLightColors[0].y, pointLightColors[0].z);
+    currentShader.uniform_3f("pointLights[0].specular", pointLightColors[0].x, pointLightColors[0].y, pointLightColors[0].z);
+
+    currentShader.uniform_3f("pointLights[1].position", pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);
+    currentShader.uniform_1f("pointLights[1].constant", 1.0f);
+    currentShader.uniform_1f("pointLights[1].linear", 0.3f);
+    currentShader.uniform_1f("pointLights[1].quadratic", 0.44f);
+    currentShader.uniform_3f("pointLights[1].ambient",  0.0f, 0.0f, 0.0f); // only the first light has ambient
+    currentShader.uniform_3f("pointLights[1].diffuse",  pointLightColors[1].x, pointLightColors[1].y, pointLightColors[1].z);
+    currentShader.uniform_3f("pointLights[1].specular",  pointLightColors[1].x, pointLightColors[1].y, pointLightColors[1].z);
+
+    currentShader.uniform_3f("pointLights[2].position", pointLightPositions[2].x, pointLightPositions[2].y, pointLightPositions[2].z);
+    currentShader.uniform_1f("pointLights[2].constant", 1.0f);
+    currentShader.uniform_1f("pointLights[2].linear", 0.3f);
+    currentShader.uniform_1f("pointLights[2].quadratic", 0.44f);
+    currentShader.uniform_3f("pointLights[2].ambient",  0.0f, 0.0f, 0.0f); // only the first light has ambient
+    currentShader.uniform_3f("pointLights[2].diffuse",  pointLightColors[2].x, pointLightColors[2].y, pointLightColors[2].z);
+    currentShader.uniform_3f("pointLights[2].specular",  pointLightColors[2].x, pointLightColors[2].y, pointLightColors[2].z);
+
+    currentShader.uniform_3f("pointLights[3].position", pointLightPositions[3].x, pointLightPositions[3].y, pointLightPositions[3].z);
+    currentShader.uniform_1f("pointLights[3].constant", 1.0f);
+    currentShader.uniform_1f("pointLights[3].linear", 0.3f);
+    currentShader.uniform_1f("pointLights[3].quadratic", 0.44f);
+    currentShader.uniform_3f("pointLights[3].ambient",  0.0f, 0.0f, 0.0f); // only the first light has ambient
+    currentShader.uniform_3f("pointLights[3].diffuse",  pointLightColors[3].x, pointLightColors[3].y, pointLightColors[3].z);
+    currentShader.uniform_3f("pointLights[3].specular",  pointLightColors[3].x, pointLightColors[3].y, pointLightColors[3].z);
 
     // Material settings
     currentShader.uniform_3f("material.ambient", 1.0f, 0.5f, 0.31f);
     currentShader.uniform_int("material.diffuse", 0); // set to texture unit 0
     currentShader.uniform_int("material.specular", 1);
     currentShader.uniform_1f("material.shininess", 64.0f);
-    currentShader.uniform_3f("light.ambient",  0.4f, 0.4f, 0.4f);
-    currentShader.uniform_3f("light.diffuse",  0.85f, 0.85f, 0.85f);
-    currentShader.uniform_3f("light.specular", 1.0f, 1.0f, 1.0f);
 
     camera.Matrix(currentShader); // this is what moves your object
 
     // light Shader (basic white color shader)
     Shader lightShader("Shaders/flatShader.vert", "Shaders/flatShader.frag");
-    lightShader.use();
-    lightShader.uniform_3f("color", lightColor.x, lightColor.y, lightColor.z);
-    lightShader.uniform_mat4("model", glm::value_ptr(light_model));
-    camera.Matrix(lightShader);
 
     float cube[] = {
         // positions          // colors           // texture coords // normals
@@ -150,7 +176,6 @@ int main()
     VAO VAO1;
     VAO1.bind();
     VBO VBO1(cube, sizeof(cube));
-    // EBO EBO1(square_indices, sizeof(square_indices));
 
     VAO1.linkAttrib(0, 3, GL_FLOAT, 11 * sizeof(float), (void *)0); // coordinates
     VAO1.linkAttrib(1, 3, GL_FLOAT, 11 * sizeof(float), (void *)(3 * sizeof(float))); // color
@@ -159,7 +184,6 @@ int main()
 
     // Unbind stuff
     VBO1.unbind();
-    // EBO1.unbind();
     VAO1.unbind();
 
     // Texture
@@ -177,6 +201,11 @@ int main()
     while (!glfwWindowShouldClose(window))
     {
         /////////////////////////////////// Input ///////////////////////////////////
+        // per-frame time logic
+        // --------------------
+        float currentFrame = static_cast<float>(glfwGetTime());
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
 
         processInput(window);
         camera.Inputs(window);
@@ -193,17 +222,11 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Render The Mesh
-        // container_texture3.bind();
-        // container_texture2.bind();
         container_texture.bind(GL_TEXTURE0);
         container_specular_texture.bind(GL_TEXTURE1);
         currentShader.use();
         VAO1.bind();
-        // EBO1.bind();
         VBO1.bind();
-        // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        // draw one cube in the center of the scene
-        // glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
         // draw a grid of cubes on the ground
@@ -222,13 +245,23 @@ int main()
 
         // gui.log("Draw");
 
-        // Render the light
-        lightShader.use();
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-
+        // Render the lights
+        const float lightScale = 0.03f;
+        for(int i=0; i<NR_POINT_LIGHTS; i++) {
+            // light matrix
+            glm::vec3 lightPos = pointLightPositions[i];
+            glm::vec3 lightColor = pointLightColors[i];
+            glm::mat4 light_model = glm::mat4(1.0f);
+            light_model = glm::translate(light_model, lightPos);
+            light_model = glm::scale(light_model, glm::vec3(lightScale, lightScale, lightScale));
+            lightShader.use();
+            lightShader.uniform_3f("color", pointLightColors[i].x, pointLightColors[i].y, pointLightColors[i].z);
+            lightShader.uniform_mat4("model", glm::value_ptr(light_model));
+            camera.Matrix(lightShader);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
 
         //////////////////////////////////// UI ////////////////////////////////////
-
         gui.update(currentShader);
 
         // Check and call events and swap the buffers
@@ -246,7 +279,6 @@ int main()
     container_texture.remove();
     container_specular_texture.remove();
     gui.cleanup();
-    
     glfwTerminate();
 
     return 0;

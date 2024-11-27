@@ -43,6 +43,11 @@ $ ./GHDgl
 
 ## Demos
 
+17. Multiple Lights
+
+Implemented multiple lights.
+![multiple_lights](demos/multi_light.png)
+
 16. Light Attenuation
 
 Implemented light attenuation.
