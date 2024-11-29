@@ -9,6 +9,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -54,6 +57,7 @@ glm::vec3 pointLightColors[] = {
 
 int main()
 {
+    Assimp::Importer importer;
     // Initialization and GLFW window creation
     GLFWwindow* window;
     int flag;
