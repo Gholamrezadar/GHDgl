@@ -4,30 +4,39 @@ My personal OpenGL sandbox project.
 I plan to implement various OpenGL features and techniques in this project.
 
 ![demo](demo.png)
-Currently tested on Windows 10 (MinGW)
+Currently tested on Windows 10 (Visual Studio 2022)
 
 ## Dependencies
 
-- CMake 3.29.1 or higher (Could work on older versions)
+- CMake 3.31 or higher
+- You need to build assimp.dll and assimp.lib by your own and place them inside `vendor/assimp/lib`
+	- also rename them in `CMakeLists.txt` file if needed.
 
 ## Stack
 
 - CMake
 - OpenGL
-- GLFW3
+- GLFW 3
 - GLAD
 - GLM
 - STB_IMAGE
-- IMGUI(Docking)
+- IMGUI (Docking)
+- ASSIMP
 
 ## Features
 
-- Simple main.cpp hello triangle example
-- Color Picker using dearimgui
+- Phong Shader
+- Multiple Lights
+- FPS Camera Movement
+- Textures
 
 ## TODO
 
-- Add TODO items!
+- [ ] Loading Meshes
+- [ ] Fresnel Shader
+- [ ] Outline Shader
+- [ ] Wireframe Shader
+- [ ] Refactoring the whole shit
 
 ## Build
 

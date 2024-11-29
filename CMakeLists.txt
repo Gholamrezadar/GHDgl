@@ -11,16 +11,6 @@ set(CMAKE_CXX_STANDARD 17)
 # Find required packages
 find_package(OpenGL REQUIRED)
 
-# Add the include directories
-include_directories(
-        vendor
-        vendor/imgui
-        vendor/glfw/include
-        vendor/glad/include
-        vendor/stb_image
-        vendor/assimp/include
-)
-
 # Header Files
 file(GLOB PROJECT_HEADERS ${PROJECT_NAME}/Headers/*.h
                         ${PROJECT_NAME}/Headers/*.hpp)
@@ -39,6 +29,16 @@ file(GLOB PROJECT_IMAGES ${PROJECT_NAME}/Media/Images/*.png
 # ImGui source files
 file(GLOB IMGUI_SOURCES vendor/imgui/*.cpp)
 
+# Add the include directories
+include_directories(
+        vendor
+        vendor/imgui
+        vendor/glfw/include
+        vendor/glad/include
+        vendor/stb_image
+        vendor/assimp/include
+)
+
 # Add glfw library
 add_subdirectory(vendor/glfw)
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE) # don't build docs
@@ -52,7 +52,6 @@ target_include_directories(glad PUBLIC vendor/glad/include)
 # Add stb_image as a library
 add_library(stb_image STATIC vendor/stb_image/stb_image.cpp)
 target_include_directories(stb_image PUBLIC vendor/stb_image)
-
 
 # Create executable 'GHDgl'
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS}
