@@ -6,7 +6,7 @@
 #include<vector>
 
 // Structure to standardize the vertices used in the meshes
-struct Vertex
+struct Vertexee
 {
 	glm::vec3 position;
 	// glm::vec3 normal;
@@ -14,7 +14,7 @@ struct Vertex
 	// glm::vec2 texUV;
 
 	// constructor
-	Vertex(glm::vec3 pos)
+	Vertexee(glm::vec3 pos)
 	{
 		position = pos;
 	}
@@ -27,7 +27,7 @@ public:
 	GLuint id;
 
 	// Constructor that generates a Vertex Buffer Object and links it to vertices
-	VBO(std::vector<Vertex>& vertices);
+	VBO(std::vector<Vertexee>& vertices);
 	VBO(float vertices[], int size);
 
 	// Binds the VBO

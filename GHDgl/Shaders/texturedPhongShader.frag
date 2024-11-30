@@ -68,5 +68,8 @@ void main()
         result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
     }
 
+    //result = vec3(max(dot(norm, viewDir), 0.0));
+    //result = vec3(norm);
+
     FragColor = vec4(result, 1.0);
 }

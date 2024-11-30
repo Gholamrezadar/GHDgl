@@ -23,6 +23,9 @@
 #include "EBO.h"
 #include "utils.h"
 #include "mygui.h"
+#include "Mesh.h"
+#include "Model.h"
+
 
 #include "Camera.h"
 const int SCR_WIDTH = 1280;
@@ -57,11 +60,11 @@ glm::vec3 pointLightColors[] = {
 
 int main()
 {
-    Assimp::Importer importer;
+    //Assimp::Importer importer;
     // Initialization and GLFW window creation
     GLFWwindow* window;
     int flag;
-    flag = initialization(window, SCR_WIDTH, SCR_HEIGHT, "GHDgl ffddldf");
+    flag = initialization(window, SCR_WIDTH, SCR_HEIGHT, "GHDgl sfsdsaaslssdsldsdasssddsdfldf");
     if (flag == -1)
         return flag;
 
@@ -92,7 +95,7 @@ int main()
     currentShader.uniform_1f("pointLights[0].constant", 1.0f);
     currentShader.uniform_1f("pointLights[0].linear", 0.3f);
     currentShader.uniform_1f("pointLights[0].quadratic", 0.44f);
-    currentShader.uniform_3f("pointLights[0].ambient",  0.2f, 0.2f, 0.2f);
+    currentShader.uniform_3f("pointLights[0].ambient",  0.4f, 0.4f, 0.4f);
     currentShader.uniform_3f("pointLights[0].diffuse",  pointLightColors[0].x, pointLightColors[0].y, pointLightColors[0].z);
     currentShader.uniform_3f("pointLights[0].specular", pointLightColors[0].x, pointLightColors[0].y, pointLightColors[0].z);
 
@@ -131,49 +134,45 @@ int main()
     // light Shader (basic white color shader)
     Shader lightShader("Shaders/flatShader.vert", "Shaders/flatShader.frag");
 
+    // I had to change this to position,normal,uv,color using google sheets!
     float cube[] = {
         // positions          // colors           // texture coords // normals
-        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,        0.0f,  0.0f, -1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,        0.0f,  0.0f, -1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,        0.0f,  0.0f, -1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,        0.0f,  0.0f, -1.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,        0.0f,  0.0f, -1.0f,
-        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,        0.0f,  0.0f, -1.0f,
-
-        -0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,        0.0f,  0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,        0.0f,  0.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,        0.0f,  0.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,        0.0f,  0.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,        0.0f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,        0.0f,  0.0f, 1.0f,
-
-        -0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,        -1.0f,  0.0f,  0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,        -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,        -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,        -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,        -1.0f,  0.0f,  0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,        -1.0f,  0.0f,  0.0f,
-
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,        1.0f,  0.0f,  0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,        1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,        1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,        1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,        1.0f,  0.0f,  0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,        1.0f,  0.0f,  0.0f,
-
-        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,        0.0f, -1.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,        0.0f, -1.0f,  0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,        0.0f, -1.0f,  0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,        0.0f, -1.0f,  0.0f,
-        -0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,        0.0f, -1.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,        0.0f, -1.0f,  0.0f,
-
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,        0.0f,  1.0f,  0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f,        0.0f,  1.0f,  0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,        0.0f,  1.0f,  0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f,        0.0f,  1.0f,  0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,        0.0f,  1.0f,  0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,        0.0f,  1.0f,  0.0f
+        -0.5f,-0.5f,-0.5f,0.0f,0.0f,-1.0f,0.0f,0.0f,1.0f,1.0f,1.0f,
+0.5f,-0.5f,-0.5f,0.0f,0.0f,-1.0f,1.0f,0.0f,1.0f,1.0f,1.0f,
+0.5f,0.5f,-0.5f,0.0f,0.0f,-1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,
+0.5f,0.5f,-0.5f,0.0f,0.0f,-1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,
+- 0.5f,0.5f,-0.5f,0.0f,0.0f,-1.0f,0.0f,1.0f,1.0f,1.0f,1.0f,
+- 0.5f,-0.5f,-0.5f,0.0f,0.0f,-1.0f,0.0f,0.0f,1.0f,1.0f,1.0f,
+- 0.5f,-0.5f,0.5f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,1.0f,1.0f,
+0.5f,-0.5f,0.5f,0.0f,0.0f,1.0f,1.0f,0.0f,1.0f,1.0f,1.0f,
+0.5f,0.5f,0.5f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,
+0.5f,0.5f,0.5f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,
+- 0.5f,0.5f,0.5f,0.0f,0.0f,1.0f,0.0f,1.0f,1.0f,1.0f,1.0f,
+- 0.5f,-0.5f,0.5f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,1.0f,1.0f,
+- 0.5f,0.5f,0.5f,-1.0f,0.0f,0.0f,1.0f,0.0f,1.0f,1.0f,1.0f,
+- 0.5f,0.5f,-0.5f,-1.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,1.0f,
+- 0.5f,-0.5f,-0.5f,-1.0f,0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,
+- 0.5f,-0.5f,-0.5f,-1.0f,0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,
+- 0.5f,-0.5f,0.5f,-1.0f,0.0f,0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,
+- 0.5f,0.5f,0.5f,-1.0f,0.0f,0.0f,1.0f,0.0f,1.0f,1.0f,1.0f,
+0.5f,0.5f,0.5f,1.0f,0.0f,0.0f,1.0f,0.0f,1.0f,1.0f,1.0f,
+0.5f,0.5f,-0.5f,1.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,1.0f,
+0.5f,-0.5f,-0.5f,1.0f,0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,
+0.5f,-0.5f,-0.5f,1.0f,0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,
+0.5f,-0.5f,0.5f,1.0f,0.0f,0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,
+0.5f,0.5f,0.5f,1.0f,0.0f,0.0f,1.0f,0.0f,1.0f,1.0f,1.0f,
+- 0.5f,-0.5f,-0.5f,0.0f,-1.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,
+0.5f,-0.5f,-0.5f,0.0f,-1.0f,0.0f,1.0f,1.0f,1.0f,1.0f,1.0f,
+0.5f,-0.5f,0.5f,0.0f,-1.0f,0.0f,1.0f,0.0f,1.0f,1.0f,1.0f,
+0.5f,-0.5f,0.5f,0.0f,-1.0f,0.0f,1.0f,0.0f,1.0f,1.0f,1.0f,
+- 0.5f,-0.5f,0.5f,0.0f,-1.0f,0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,
+- 0.5f,-0.5f,-0.5f,0.0f,-1.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,
+- 0.5f,0.5f,-0.5f,0.0f,1.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,
+0.5f,0.5f,-0.5f,0.0f,1.0f,0.0f,1.0f,1.0f,1.0f,1.0f,1.0f,
+0.5f,0.5f,0.5f,0.0f,1.0f,0.0f,1.0f,0.0f,1.0f,1.0f,1.0f,
+0.5f,0.5f,0.5f,0.0f,1.0f,0.0f,1.0f,0.0f,1.0f,1.0f,1.0f,
+- 0.5f,0.5f,0.5f,0.0f,1.0f,0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,
+- 0.5f,0.5f,-0.5f,0.0f,1.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,
     };
 
     // Mesh
@@ -197,11 +196,33 @@ int main()
     const char* container2_specular_image_address = "Images/container2_specular.png";
     Texturee container_specular_texture(container2_specular_image_address, GL_TEXTURE_2D, GL_TEXTURE1, GL_RGBA, GL_UNSIGNED_BYTE);
 
+    const char* white_image_address = "Images/white.png";
+    Texturee white_texture(white_image_address, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+
+    const char* white_specular_image_address = "Images/white_specular.png";
+    Texturee white_specular_texture(white_specular_image_address, GL_TEXTURE_2D, GL_TEXTURE1, GL_RGBA, GL_UNSIGNED_BYTE);
+
     MyGUI3 gui;
+
+    // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
+    //stbi_set_flip_vertically_on_load(true);
+
+    // configure global opengl state
+    // -----------------------------
+    glEnable(GL_DEPTH_TEST);
+
+    // load models
+    // -----------
+    Model ourModel("C:\\Users\\ghd\\Desktop\\bunny2.obj");
+    //Model ourModel("C:\\Users\\ghd\\Downloads\\backpack\\backpack.obj");
+
+
+    // draw in wireframe
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
 
     // Main loop
     int frameNumber = 0;
-
     while (!glfwWindowShouldClose(window))
     {
         /////////////////////////////////// Input ///////////////////////////////////
@@ -221,7 +242,7 @@ int main()
         /////////////////////////////////// Draw ///////////////////////////////////
 
         // Clear background
-        glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+        //glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         // gui.log("glClearColor");
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -232,9 +253,8 @@ int main()
         VAO1.bind();
         VBO1.bind();
 
-
         // draw a grid of cubes on the ground
-        float gap = 0.05f;
+        float gap = 0.04f;
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
                 // change the model matrix to move the cube to the correct position
@@ -265,6 +285,17 @@ int main()
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
 
+        // render the loaded model
+        white_texture.bind(GL_TEXTURE0);
+        white_specular_texture.bind(GL_TEXTURE1);
+        currentShader.use();
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, 0.8f, 0.0f)); // translate it down so it's at the center of the scene
+        model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
+        currentShader.uniform_mat4("model", glm::value_ptr(model));
+        camera.Matrix(currentShader);
+        ourModel.Draw(currentShader);
+
         //////////////////////////////////// UI ////////////////////////////////////
         gui.update(currentShader);
 
@@ -282,6 +313,9 @@ int main()
     currentShader.remove();
     container_texture.remove();
     container_specular_texture.remove();
+    white_texture.remove();
+    white_specular_texture.remove();
+    
     gui.cleanup();
     glfwTerminate();
 
