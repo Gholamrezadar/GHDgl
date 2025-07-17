@@ -84,13 +84,19 @@ ImGui::Begin("Color Picker");
 
 void MyGUI3::update(Shader& flatTextureShader)
 {
-    calcFPS(0.1666);
+    calcFPS(0);
     renderGUI(flatTextureShader);
 }
 
 void MyGUI3::log(std::string message)
 {
     logs.insert(logs.begin(), message);
+
+    // keep the length of logs to 100
+    if (logs.size() > 100)
+    {
+        logs.pop_back();
+    }
 }
 
 void MyGUI3::cleanup()

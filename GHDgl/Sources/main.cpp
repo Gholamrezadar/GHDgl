@@ -242,11 +242,11 @@ int main()
         /////////////////////////////////// Draw ///////////////////////////////////
 
         // Clear background
-        //glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+        glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         // gui.log("glClearColor");
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Render The Mesh
+        // Render The Scene 
         container_texture.bind(GL_TEXTURE0);
         container_specular_texture.bind(GL_TEXTURE1);
         currentShader.use();

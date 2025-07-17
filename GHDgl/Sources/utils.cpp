@@ -44,9 +44,13 @@ int initialization(GLFWwindow *&window, int width, int height, const char *title
         glfwTerminate();
         return -1;
     }
-
+    
+    
     // Make the OpenGL context of the window the current one
     glfwMakeContextCurrent(window);
+    
+    // Disable Vsync
+    glfwSwapInterval(0);
 
     // Initialize GLAD
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
