@@ -52,10 +52,10 @@ glm::vec3 pointLightPositions[] = {
 };
 
 glm::vec3 pointLightColors[] = {
-    glm::vec3(0.85f, 0.85f, 0.85f), // white
-    glm::vec3(0.85f, 0.1f, 0.1f)*1.0f, // red
-    glm::vec3(0.1f, 0.85f, 0.1f), // green
     glm::vec3(0.1f, 0.1f, 0.85f), // blue
+    glm::vec3(0.85f, 0.1f, 0.1f)*1.0f, // red
+    glm::vec3(0.85f, 0.85f, 0.85f), // white
+    glm::vec3(0.1f, 0.85f, 0.1f), // green
 };
 
 int main()
@@ -64,7 +64,7 @@ int main()
     // Initialization and GLFW window creation
     GLFWwindow* window;
     int flag;
-    flag = initialization(window, SCR_WIDTH, SCR_HEIGHT, "GHDgl sfsdsaaslssdsldsdasssddsdfldf");
+    flag = initialization(window, SCR_WIDTH, SCR_HEIGHT, "GHDgl");
     if (flag == -1)
         return flag;
 
@@ -213,7 +213,7 @@ int main()
 
     // load models
     // -----------
-    Model ourModel("C:\\Users\\ghd\\Desktop\\bunny2.obj");
+    Model ourModel("Models/suzanne.obj");
     //Model ourModel("C:\\Users\\ghd\\Downloads\\backpack\\backpack.obj");
 
 
@@ -290,8 +290,8 @@ int main()
         white_specular_texture.bind(GL_TEXTURE1);
         currentShader.use();
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.8f, 0.0f)); // translate it down so it's at the center of the scene
-        model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
+        model = glm::translate(model, glm::vec3(0.0f, 0.5f, 0.0f)); // translate it down so it's at the center of the scene
+        model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));	// it's a bit too big for our scene, so scale it down
         currentShader.uniform_mat4("model", glm::value_ptr(model));
         camera.Matrix(currentShader);
         ourModel.Draw(currentShader);

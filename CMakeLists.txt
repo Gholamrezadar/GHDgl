@@ -26,6 +26,9 @@ file(GLOB PROJECT_SHADERS ${PROJECT_NAME}/Shaders/*.comp
 file(GLOB PROJECT_IMAGES ${PROJECT_NAME}/Media/Images/*.png
                         ${PROJECT_NAME}/Media/Images/*.jpg)
 
+# Models
+file(GLOB PROJECT_MODELS ${PROJECT_NAME}/Media/Models/*.obj)
+
 # ImGui source files
 file(GLOB IMGUI_SOURCES vendor/imgui/*.cpp)
 
@@ -81,7 +84,7 @@ add_custom_command(
 add_custom_command(
     TARGET ${PROJECT_NAME} PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/Media/ $<TARGET_FILE_DIR:${PROJECT_NAME}>
-    DEPENDS ${PROJECT_IMAGES}
+    DEPENDS ${PROJECT_IMAGES} ${PROJECT_MODELS}
 )
 
 # copy assimp-vc143-mtd.dll into the build directory (Note: Change to the assimp.dll you built using your own compiler!)
