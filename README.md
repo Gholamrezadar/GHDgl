@@ -17,38 +17,38 @@ Currently tested on Windows 10 (Visual Studio 2022)
 - CMake
 - OpenGL
 - GLFW 3
-- GLAD
-- GLM
-- STB_IMAGE
-- IMGUI (Docking)
-- ASSIMP
+- glad 
+- glm 
+- stb_image 
+- imgui (Docking)
+- assimp 
 
 ## Features
 
-- Phong Shader
-- Multiple Lights
 - FPS Camera Movement
-- Textures
+- Blinn-Phong Shading
+- Multiple Point Lights
 - Loading Models
+- Textures
 
-## TODO
+<!-- ## TODO
 
 - [ ] Fresnel Shader
 - [ ] Outline Shader
 - [ ] Wireframe Shader
 - [ ] Normal Shader
-- [ ] Refactoring the whole shit
+- [ ] Refactoring the whole shit -->
 
 ## Build
 
 ```bash
-$ git clone repo
-$ cd GHDgl
-$ mkdir build
-$ cd build
-$ cmake ..
-$ cmake --build .
-$ ./GHDgl
+git clone repo
+cd GHDgl
+mkdir build
+cd build
+cmake ..
+cmake --build .
+./GHDgl
 ```
 
 **NOTE**:  Also make sure to build `assimp.dll` and `assimp.lib` for you own system and place it in `GHDgl/vendor/assimp/lib`. if your files have different names, either rename them to match or change the corresponding names in `CMakeLists.txt` file.
