@@ -223,6 +223,8 @@ int main()
 
     // Main loop
     int frameNumber = 0;
+    glm::vec3 oldCameraPos = camera.Position;
+    glm::vec3 oldCameraOrient = camera.Orientation;
     while (!glfwWindowShouldClose(window))
     {
         /////////////////////////////////// Input ///////////////////////////////////
@@ -237,7 +239,12 @@ int main()
         camera.Matrix(currentShader);
         camera.Matrix(lightShader);
         camera.UpdatePositionInShader(currentShader);
-        gui.log("Camera position: " + std::to_string(camera.Position.x) + " " + std::to_string(camera.Position.y) + " " + std::to_string(camera.Position.z));
+        
+        // Detect camera move
+        if(camera.Position != oldCameraPos || camera.Orientation != oldCameraOrient) {
+            gui.log("Camera orientation: " + std::to_string(camera.Orientation.x) + " " + std::to_string(camera.Orientation.y) + " " + std::to_string(camera.Orientation.z));
+            gui.log("Camera position: " + std::to_string(camera.Position.x) + " " + std::to_string(camera.Position.y) + " " + std::to_string(camera.Position.z));
+        }
 
         /////////////////////////////////// Draw ///////////////////////////////////
 
