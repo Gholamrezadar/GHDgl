@@ -57,7 +57,8 @@ $ ./GHDgl
 
 ### 20. Linearize Depth (Depth Visualization)
 
-Convert the non-linear `gl_FragCoord.z` to linear and visualize it
+Convert the non-linear `gl_FragCoord.z` to linear and visualize it. Visit https://github.com/Gholamrezadar/GHDgl/commit/9f066b032e3883c3d11bd801105f39f8600aa53a to view it.
+
 ![depth_viz](demos/linear_depth.png)
 
 ### 19. Model Loading Part 2
