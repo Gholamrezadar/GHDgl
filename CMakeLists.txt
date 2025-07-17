@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.11)
 project(GHDgl)
 
 # change to Debug for debug build and Release for release build
