@@ -79,7 +79,7 @@ int main()
     camera.Position += glm::vec3(1.5f, 1.5f, 1.5f);
     camera.Position += glm::vec3(0.0f, -0.35f, 0.0f);
     camera.Orientation = glm::rotate(camera.Orientation, glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    camera.Orientation = glm::rotate(camera.Orientation, glm::radians(-45.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    camera.Orientation = glm::rotate(camera.Orientation, glm::radians(-35.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     // look at the light
 
     // Box Shader

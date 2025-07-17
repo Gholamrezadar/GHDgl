@@ -55,6 +55,11 @@ $ ./GHDgl
 
 ## Dev Log
 
+### 21. Blinn-Phong Shading
+
+Implemented blinn-phong shading. here is the before after
+![comparison](demos/blinn_phong_shading_comparison.jpg)
+
 ### 20. Linearize Depth (Depth Visualization)
 
 Convert the non-linear `gl_FragCoord.z` to linear and visualize it. Visit https://github.com/Gholamrezadar/GHDgl/commit/9f066b032e3883c3d11bd801105f39f8600aa53a to view it.
