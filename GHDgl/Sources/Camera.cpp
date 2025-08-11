@@ -75,7 +75,12 @@ void Camera::Inputs(GLFWwindow* window)
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
 	{
 		// Hides mouse cursor
+		#ifdef __WIN32__
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		#endif
+		#ifdef __linux__
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		#endif
 
 		// Prevents camera from jumping on the first click
 		if (firstClick)
