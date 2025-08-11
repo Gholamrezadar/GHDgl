@@ -55,6 +55,12 @@ cmake --build .
 
 ## Dev Log
 
+### 23. Culling
+
+Implemented culling.
+
+![culling](demos/culling_scene.png)
+
 ### 22. Depth Testing
 
 Here is after changing the depth test func to `GL_ALWAYS`. Displaying the fragments based on the order they were drawn.
