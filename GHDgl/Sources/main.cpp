@@ -1,33 +1,33 @@
 #define GLAD_GL_IMPLEMENTATION
 
-#include <iostream>
-#include <vector>
-#include <string>
-
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
+#include <assimp/Importer.hpp>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
+
+#include <iostream>
+#include <string>
+#include <vector>
+
+#include "Camera.h"
+#include "EBO.h"
+#include "Mesh.h"
+#include "Model.h"
+#include "Mygui.h"
+#include "Shader.h"
+#include "Texturee.h"
+#include "VAO.h"
+#include "VBO.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-
-#include "Texturee.h"
-#include "Shader.h"
-#include "VAO.h"
-#include "VBO.h"
-#include "EBO.h"
 #include "utils.h"
-#include "Mygui.h"
-#include "Mesh.h"
-#include "Model.h"
-
-
-#include "Camera.h"
 const int SCR_WIDTH = 1280;
 const int SCR_HEIGHT = 720;
 
@@ -37,12 +37,10 @@ const int NR_POINT_LIGHTS = 4;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-void processInput(GLFWwindow *window)
-{
+void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 }
-
 
 glm::vec3 pointLightPositions[] = {
     glm::vec3(0.45, 0.55f, 0.0f),
@@ -52,16 +50,15 @@ glm::vec3 pointLightPositions[] = {
 };
 
 glm::vec3 pointLightColors[] = {
-    glm::vec3(0.1f, 0.1f, 0.85f), // blue
-    glm::vec3(0.85f, 0.1f, 0.1f)*1.0f, // red
-    glm::vec3(0.85f, 0.85f, 0.85f), // white
-    glm::vec3(0.1f, 0.85f, 0.1f), // green
+    glm::vec3(0.1f, 0.1f, 0.85f),         // blue
+    glm::vec3(0.85f, 0.1f, 0.1f) * 1.0f,  // red
+    glm::vec3(0.85f, 0.85f, 0.85f),       // white
+    glm::vec3(0.1f, 0.85f, 0.1f),         // green
 };
 
-int main()
-{
-    //Assimp::Importer importer;
-    // Initialization and GLFW window creation
+int main() {
+    // Assimp::Importer importer;
+    //  Initialization and GLFW window creation
     GLFWwindow* window;
     int flag;
     flag = initialization(window, SCR_WIDTH, SCR_HEIGHT, "GHDgl");
@@ -96,41 +93,41 @@ int main()
     currentShader.uniform_1f("pointLights[0].constant", 1.0f);
     currentShader.uniform_1f("pointLights[0].linear", 0.3f);
     currentShader.uniform_1f("pointLights[0].quadratic", 0.44f);
-    currentShader.uniform_3f("pointLights[0].ambient",  0.4f, 0.4f, 0.4f);
-    currentShader.uniform_3f("pointLights[0].diffuse",  pointLightColors[0].x, pointLightColors[0].y, pointLightColors[0].z);
+    currentShader.uniform_3f("pointLights[0].ambient", 0.4f, 0.4f, 0.4f);
+    currentShader.uniform_3f("pointLights[0].diffuse", pointLightColors[0].x, pointLightColors[0].y, pointLightColors[0].z);
     currentShader.uniform_3f("pointLights[0].specular", pointLightColors[0].x, pointLightColors[0].y, pointLightColors[0].z);
 
     currentShader.uniform_3f("pointLights[1].position", pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);
     currentShader.uniform_1f("pointLights[1].constant", 1.0f);
     currentShader.uniform_1f("pointLights[1].linear", 0.3f);
     currentShader.uniform_1f("pointLights[1].quadratic", 0.44f);
-    currentShader.uniform_3f("pointLights[1].ambient",  0.0f, 0.0f, 0.0f); // only the first light has ambient
-    currentShader.uniform_3f("pointLights[1].diffuse",  pointLightColors[1].x, pointLightColors[1].y, pointLightColors[1].z);
-    currentShader.uniform_3f("pointLights[1].specular",  pointLightColors[1].x, pointLightColors[1].y, pointLightColors[1].z);
+    currentShader.uniform_3f("pointLights[1].ambient", 0.0f, 0.0f, 0.0f);  // only the first light has ambient
+    currentShader.uniform_3f("pointLights[1].diffuse", pointLightColors[1].x, pointLightColors[1].y, pointLightColors[1].z);
+    currentShader.uniform_3f("pointLights[1].specular", pointLightColors[1].x, pointLightColors[1].y, pointLightColors[1].z);
 
     currentShader.uniform_3f("pointLights[2].position", pointLightPositions[2].x, pointLightPositions[2].y, pointLightPositions[2].z);
     currentShader.uniform_1f("pointLights[2].constant", 1.0f);
     currentShader.uniform_1f("pointLights[2].linear", 0.3f);
     currentShader.uniform_1f("pointLights[2].quadratic", 0.44f);
-    currentShader.uniform_3f("pointLights[2].ambient",  0.0f, 0.0f, 0.0f); // only the first light has ambient
-    currentShader.uniform_3f("pointLights[2].diffuse",  pointLightColors[2].x, pointLightColors[2].y, pointLightColors[2].z);
-    currentShader.uniform_3f("pointLights[2].specular",  pointLightColors[2].x, pointLightColors[2].y, pointLightColors[2].z);
+    currentShader.uniform_3f("pointLights[2].ambient", 0.0f, 0.0f, 0.0f);  // only the first light has ambient
+    currentShader.uniform_3f("pointLights[2].diffuse", pointLightColors[2].x, pointLightColors[2].y, pointLightColors[2].z);
+    currentShader.uniform_3f("pointLights[2].specular", pointLightColors[2].x, pointLightColors[2].y, pointLightColors[2].z);
 
     currentShader.uniform_3f("pointLights[3].position", pointLightPositions[3].x, pointLightPositions[3].y, pointLightPositions[3].z);
     currentShader.uniform_1f("pointLights[3].constant", 1.0f);
     currentShader.uniform_1f("pointLights[3].linear", 0.3f);
     currentShader.uniform_1f("pointLights[3].quadratic", 0.44f);
-    currentShader.uniform_3f("pointLights[3].ambient",  0.0f, 0.0f, 0.0f); // only the first light has ambient
-    currentShader.uniform_3f("pointLights[3].diffuse",  pointLightColors[3].x, pointLightColors[3].y, pointLightColors[3].z);
-    currentShader.uniform_3f("pointLights[3].specular",  pointLightColors[3].x, pointLightColors[3].y, pointLightColors[3].z);
+    currentShader.uniform_3f("pointLights[3].ambient", 0.0f, 0.0f, 0.0f);  // only the first light has ambient
+    currentShader.uniform_3f("pointLights[3].diffuse", pointLightColors[3].x, pointLightColors[3].y, pointLightColors[3].z);
+    currentShader.uniform_3f("pointLights[3].specular", pointLightColors[3].x, pointLightColors[3].y, pointLightColors[3].z);
 
     // Material settings
     currentShader.uniform_3f("material.ambient", 1.0f, 0.5f, 0.31f);
-    currentShader.uniform_int("material.diffuse", 0); // set to texture unit 0
+    currentShader.uniform_int("material.diffuse", 0);  // set to texture unit 0
     currentShader.uniform_int("material.specular", 1);
     currentShader.uniform_1f("material.shininess", 64.0f);
 
-    camera.Matrix(currentShader); // this is what moves your object
+    camera.Matrix(currentShader);  // this is what moves your object
 
     // light Shader (basic white color shader)
     Shader lightShader("Shaders/flatShader.vert", "Shaders/flatShader.frag");
@@ -139,42 +136,402 @@ int main()
     // I had to change this to position,normal,uv,color using google sheets!
     float cube[] = {
         // positions          // colors           // texture coords // normals
-        -0.5f,-0.5f,-0.5f,0.0f,0.0f,-1.0f,0.0f,0.0f,1.0f,1.0f,1.0f,
-0.5f,-0.5f,-0.5f,0.0f,0.0f,-1.0f,1.0f,0.0f,1.0f,1.0f,1.0f,
-0.5f,0.5f,-0.5f,0.0f,0.0f,-1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,
-0.5f,0.5f,-0.5f,0.0f,0.0f,-1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,
-- 0.5f,0.5f,-0.5f,0.0f,0.0f,-1.0f,0.0f,1.0f,1.0f,1.0f,1.0f,
-- 0.5f,-0.5f,-0.5f,0.0f,0.0f,-1.0f,0.0f,0.0f,1.0f,1.0f,1.0f,
-- 0.5f,-0.5f,0.5f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,1.0f,1.0f,
-0.5f,-0.5f,0.5f,0.0f,0.0f,1.0f,1.0f,0.0f,1.0f,1.0f,1.0f,
-0.5f,0.5f,0.5f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,
-0.5f,0.5f,0.5f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,
-- 0.5f,0.5f,0.5f,0.0f,0.0f,1.0f,0.0f,1.0f,1.0f,1.0f,1.0f,
-- 0.5f,-0.5f,0.5f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,1.0f,1.0f,
-- 0.5f,0.5f,0.5f,-1.0f,0.0f,0.0f,1.0f,0.0f,1.0f,1.0f,1.0f,
-- 0.5f,0.5f,-0.5f,-1.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,1.0f,
-- 0.5f,-0.5f,-0.5f,-1.0f,0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,
-- 0.5f,-0.5f,-0.5f,-1.0f,0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,
-- 0.5f,-0.5f,0.5f,-1.0f,0.0f,0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,
-- 0.5f,0.5f,0.5f,-1.0f,0.0f,0.0f,1.0f,0.0f,1.0f,1.0f,1.0f,
-0.5f,0.5f,0.5f,1.0f,0.0f,0.0f,1.0f,0.0f,1.0f,1.0f,1.0f,
-0.5f,0.5f,-0.5f,1.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,1.0f,
-0.5f,-0.5f,-0.5f,1.0f,0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,
-0.5f,-0.5f,-0.5f,1.0f,0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,
-0.5f,-0.5f,0.5f,1.0f,0.0f,0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,
-0.5f,0.5f,0.5f,1.0f,0.0f,0.0f,1.0f,0.0f,1.0f,1.0f,1.0f,
-- 0.5f,-0.5f,-0.5f,0.0f,-1.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,
-0.5f,-0.5f,-0.5f,0.0f,-1.0f,0.0f,1.0f,1.0f,1.0f,1.0f,1.0f,
-0.5f,-0.5f,0.5f,0.0f,-1.0f,0.0f,1.0f,0.0f,1.0f,1.0f,1.0f,
-0.5f,-0.5f,0.5f,0.0f,-1.0f,0.0f,1.0f,0.0f,1.0f,1.0f,1.0f,
-- 0.5f,-0.5f,0.5f,0.0f,-1.0f,0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,
-- 0.5f,-0.5f,-0.5f,0.0f,-1.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,
-- 0.5f,0.5f,-0.5f,0.0f,1.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,
-0.5f,0.5f,-0.5f,0.0f,1.0f,0.0f,1.0f,1.0f,1.0f,1.0f,1.0f,
-0.5f,0.5f,0.5f,0.0f,1.0f,0.0f,1.0f,0.0f,1.0f,1.0f,1.0f,
-0.5f,0.5f,0.5f,0.0f,1.0f,0.0f,1.0f,0.0f,1.0f,1.0f,1.0f,
-- 0.5f,0.5f,0.5f,0.0f,1.0f,0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,
-- 0.5f,0.5f,-0.5f,0.0f,1.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,
+        -0.5f,
+        -0.5f,
+        -0.5f,
+        0.0f,
+        0.0f,
+        -1.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        0.5f,
+        -0.5f,
+        -0.5f,
+        0.0f,
+        0.0f,
+        -1.0f,
+        1.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        0.5f,
+        0.5f,
+        -0.5f,
+        0.0f,
+        0.0f,
+        -1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        0.5f,
+        0.5f,
+        -0.5f,
+        0.0f,
+        0.0f,
+        -1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        -0.5f,
+        0.5f,
+        -0.5f,
+        0.0f,
+        0.0f,
+        -1.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        -0.5f,
+        -0.5f,
+        -0.5f,
+        0.0f,
+        0.0f,
+        -1.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        -0.5f,
+        -0.5f,
+        0.5f,
+        0.0f,
+        0.0f,
+        1.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        0.5f,
+        -0.5f,
+        0.5f,
+        0.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        0.5f,
+        0.5f,
+        0.5f,
+        0.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        0.5f,
+        0.5f,
+        0.5f,
+        0.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        -0.5f,
+        0.5f,
+        0.5f,
+        0.0f,
+        0.0f,
+        1.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        -0.5f,
+        -0.5f,
+        0.5f,
+        0.0f,
+        0.0f,
+        1.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        -0.5f,
+        0.5f,
+        0.5f,
+        -1.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        -0.5f,
+        0.5f,
+        -0.5f,
+        -1.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        -0.5f,
+        -0.5f,
+        -0.5f,
+        -1.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        -0.5f,
+        -0.5f,
+        -0.5f,
+        -1.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        -0.5f,
+        -0.5f,
+        0.5f,
+        -1.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        -0.5f,
+        0.5f,
+        0.5f,
+        -1.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        0.5f,
+        0.5f,
+        0.5f,
+        1.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        0.5f,
+        0.5f,
+        -0.5f,
+        1.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        0.5f,
+        -0.5f,
+        -0.5f,
+        1.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        0.5f,
+        -0.5f,
+        -0.5f,
+        1.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        0.5f,
+        -0.5f,
+        0.5f,
+        1.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        0.5f,
+        0.5f,
+        0.5f,
+        1.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        -0.5f,
+        -0.5f,
+        -0.5f,
+        0.0f,
+        -1.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        0.5f,
+        -0.5f,
+        -0.5f,
+        0.0f,
+        -1.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        0.5f,
+        -0.5f,
+        0.5f,
+        0.0f,
+        -1.0f,
+        0.0f,
+        1.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        0.5f,
+        -0.5f,
+        0.5f,
+        0.0f,
+        -1.0f,
+        0.0f,
+        1.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        -0.5f,
+        -0.5f,
+        0.5f,
+        0.0f,
+        -1.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        -0.5f,
+        -0.5f,
+        -0.5f,
+        0.0f,
+        -1.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        -0.5f,
+        0.5f,
+        -0.5f,
+        0.0f,
+        1.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        0.5f,
+        0.5f,
+        -0.5f,
+        0.0f,
+        1.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        0.5f,
+        0.5f,
+        0.5f,
+        0.0f,
+        1.0f,
+        0.0f,
+        1.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        0.5f,
+        0.5f,
+        0.5f,
+        0.0f,
+        1.0f,
+        0.0f,
+        1.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        -0.5f,
+        0.5f,
+        0.5f,
+        0.0f,
+        1.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        -0.5f,
+        0.5f,
+        -0.5f,
+        0.0f,
+        1.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        1.0f,
+        1.0f,
     };
 
     // Mesh
@@ -182,10 +539,10 @@ int main()
     VAO1.bind();
     VBO VBO1(cube, sizeof(cube));
 
-    VAO1.linkAttrib(0, 3, GL_FLOAT, 11 * sizeof(float), (void *)0); // coordinates
-    VAO1.linkAttrib(1, 3, GL_FLOAT, 11 * sizeof(float), (void *)(3 * sizeof(float))); // color
-    VAO1.linkAttrib(2, 2, GL_FLOAT, 11 * sizeof(float), (void *)(6 * sizeof(float))); // tex coords
-    VAO1.linkAttrib(3, 3, GL_FLOAT, 11 * sizeof(float), (void *)(8 * sizeof(float))); // normals
+    VAO1.linkAttrib(0, 3, GL_FLOAT, 11 * sizeof(float), (void*)0);                    // coordinates
+    VAO1.linkAttrib(1, 3, GL_FLOAT, 11 * sizeof(float), (void*)(3 * sizeof(float)));  // color
+    VAO1.linkAttrib(2, 2, GL_FLOAT, 11 * sizeof(float), (void*)(6 * sizeof(float)));  // tex coords
+    VAO1.linkAttrib(3, 3, GL_FLOAT, 11 * sizeof(float), (void*)(8 * sizeof(float)));  // normals
 
     // Unbind stuff
     VBO1.unbind();
@@ -207,7 +564,7 @@ int main()
     MyGUI3 gui;
 
     // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
-    //stbi_set_flip_vertically_on_load(true);
+    // stbi_set_flip_vertically_on_load(true);
 
     // configure global opengl state
     // -----------------------------
@@ -218,19 +575,16 @@ int main()
     // load models
     // -----------
     Model ourModel("Models/suzanne.obj");
-    //Model ourModel("C:\\Users\\ghd\\Downloads\\backpack\\backpack.obj");
-
+    // Model ourModel("C:\\Users\\ghd\\Downloads\\backpack\\backpack.obj");
 
     // draw in wireframe
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // Main loop
     int frameNumber = 0;
     glm::vec3 oldCameraPos = camera.Position;
     glm::vec3 oldCameraOrient = camera.Orientation;
-    while (!glfwWindowShouldClose(window))
-    {
+    while (!glfwWindowShouldClose(window)) {
         /////////////////////////////////// Input ///////////////////////////////////
         // per-frame time logic
         // --------------------
@@ -243,9 +597,9 @@ int main()
         camera.Matrix(currentShader);
         camera.Matrix(lightShader);
         camera.UpdatePositionInShader(currentShader);
-        
+
         // Detect camera move
-        if(camera.Position != oldCameraPos || camera.Orientation != oldCameraOrient) {
+        if (camera.Position != oldCameraPos || camera.Orientation != oldCameraOrient) {
             gui.log("Camera orientation: " + std::to_string(camera.Orientation.x) + " " + std::to_string(camera.Orientation.y) + " " + std::to_string(camera.Orientation.z));
             gui.log("Camera position: " + std::to_string(camera.Position.x) + " " + std::to_string(camera.Position.y) + " " + std::to_string(camera.Position.z));
         }
@@ -257,55 +611,95 @@ int main()
         // gui.log("glClearColor");
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Render The Scene 
-        container_texture.bind(GL_TEXTURE0);
-        container_specular_texture.bind(GL_TEXTURE1);
-        currentShader.use();
-        VAO1.bind();
-        VBO1.bind();
+        // Render The Boxes and Bunny Scene
+        if (false) {
+            container_texture.bind(GL_TEXTURE0);
+            container_specular_texture.bind(GL_TEXTURE1);
+            currentShader.use();
+            VAO1.bind();
+            VBO1.bind();
 
-        // draw a grid of cubes on the ground
-        float gap = 0.04f;
-        for (int i = -1; i <= 1; i++) {
-            for (int j = -1; j <= 1; j++) {
-                // change the model matrix to move the cube to the correct position
+            // draw a grid of cubes on the ground
+            float gap = 0.04f;
+            for (int i = -1; i <= 1; i++) {
+                for (int j = -1; j <= 1; j++) {
+                    // change the model matrix to move the cube to the correct position
+                    glm::mat4 model = glm::mat4(1.0f);
+                    model = glm::translate(model, glm::vec3(i * (1.0f + gap), 0.0f, j * (1.0f + gap)));
+                    currentShader.use();
+                    currentShader.uniform_mat4("model", glm::value_ptr(model));
+                    camera.Matrix(currentShader);
+                    glDrawArrays(GL_TRIANGLES, 0, 36);
+                }
+            }
+
+            // gui.log("Draw");
+
+            // Render the lights
+            const float lightScale = 0.03f;
+            for (int i = 0; i < NR_POINT_LIGHTS; i++) {
+                // light matrix
+                glm::vec3 lightPos = pointLightPositions[i];
+                glm::vec3 lightColor = pointLightColors[i];
+                glm::mat4 light_model = glm::mat4(1.0f);
+                light_model = glm::translate(light_model, lightPos);
+                light_model = glm::scale(light_model, glm::vec3(lightScale, lightScale, lightScale));
+                lightShader.use();
+                lightShader.uniform_3f("color", pointLightColors[i].x, pointLightColors[i].y, pointLightColors[i].z);
+                lightShader.uniform_mat4("model", glm::value_ptr(light_model));
+                camera.Matrix(lightShader);
+                glDrawArrays(GL_TRIANGLES, 0, 36);
+            }
+
+            // render the loaded model
+            white_texture.bind(GL_TEXTURE0);
+            white_specular_texture.bind(GL_TEXTURE1);
+            currentShader.use();
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, glm::vec3(0.0f, 0.5f, 0.0f));  // translate it down so it's at the center of the scene
+            model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));      // it's a bit too big for our scene, so scale it down
+            currentShader.uniform_mat4("model", glm::value_ptr(model));
+            camera.Matrix(currentShader);
+            ourModel.Draw(currentShader);
+        }
+
+        // Render Culled Box and Bunny inside Scene
+        if (true) {
+            container_texture.bind(GL_TEXTURE0);
+            container_specular_texture.bind(GL_TEXTURE1);
+            currentShader.use();
+            VAO1.bind();
+            VBO1.bind();
+
+            {
                 glm::mat4 model = glm::mat4(1.0f);
-                model = glm::translate(model, glm::vec3(i * (1.0f+gap), 0.0f, j * (1.0f+gap)));
+                model = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.0f));
+                float scaleFactor = 2.0f;
+                model = glm::scale(model, glm::vec3(scaleFactor));
                 currentShader.use();
                 currentShader.uniform_mat4("model", glm::value_ptr(model));
                 camera.Matrix(currentShader);
+
+                // enable culling so we only see the inner faces of the box
+                glEnable(GL_CULL_FACE);
+                glCullFace(GL_FRONT);
                 glDrawArrays(GL_TRIANGLES, 0, 36);
+                glDisable(GL_CULL_FACE); // reset
+            }
+
+            // render the loaded model
+            {
+                white_texture.bind(GL_TEXTURE0);
+                white_specular_texture.bind(GL_TEXTURE1);
+                currentShader.use();
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::translate(model, glm::vec3(0.0f, 0.5f, 0.0f));  // translate it down so it's at the center of the scene
+                model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));      // it's a bit too big for our scene, so scale it down
+                currentShader.uniform_mat4("model", glm::value_ptr(model));
+                camera.Matrix(currentShader);
+                ourModel.Draw(currentShader);
             }
         }
-
-        // gui.log("Draw");
-
-        // Render the lights
-        const float lightScale = 0.03f;
-        for(int i=0; i<NR_POINT_LIGHTS; i++) {
-            // light matrix
-            glm::vec3 lightPos = pointLightPositions[i];
-            glm::vec3 lightColor = pointLightColors[i];
-            glm::mat4 light_model = glm::mat4(1.0f);
-            light_model = glm::translate(light_model, lightPos);
-            light_model = glm::scale(light_model, glm::vec3(lightScale, lightScale, lightScale));
-            lightShader.use();
-            lightShader.uniform_3f("color", pointLightColors[i].x, pointLightColors[i].y, pointLightColors[i].z);
-            lightShader.uniform_mat4("model", glm::value_ptr(light_model));
-            camera.Matrix(lightShader);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
-
-        // render the loaded model
-        white_texture.bind(GL_TEXTURE0);
-        white_specular_texture.bind(GL_TEXTURE1);
-        currentShader.use();
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.5f, 0.0f)); // translate it down so it's at the center of the scene
-        model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));	// it's a bit too big for our scene, so scale it down
-        currentShader.uniform_mat4("model", glm::value_ptr(model));
-        camera.Matrix(currentShader);
-        ourModel.Draw(currentShader);
 
         //////////////////////////////////// UI ////////////////////////////////////
         gui.update(currentShader);
@@ -316,7 +710,7 @@ int main()
 
         frameNumber++;
 
-    } // Main loop end
+    }  // Main loop end
 
     // Cleanup and terminate
     VAO1.remove();
@@ -326,7 +720,7 @@ int main()
     container_specular_texture.remove();
     white_texture.remove();
     white_specular_texture.remove();
-    
+
     gui.cleanup();
     glfwTerminate();
 
