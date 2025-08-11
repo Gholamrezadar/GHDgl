@@ -83,8 +83,8 @@ int main()
     // look at the light
 
     // Box Shader
-    // Shader currentShader("Shaders/texturedPhongShader.vert", "Shaders/texturedPhongShader.frag");
-    Shader currentShader("Shaders/depthShader.vert", "Shaders/depthShader.frag");
+    Shader currentShader("Shaders/texturedPhongShader.vert", "Shaders/texturedPhongShader.frag");
+    // Shader currentShader("Shaders/depthShader.vert", "Shaders/depthShader.frag");
     currentShader.use();
     currentShader.uniform_3f("color", 0.0f, 1.0f, 0.0f);
     // currentShader.uniform_1f("texture1", 0);
@@ -133,8 +133,8 @@ int main()
     camera.Matrix(currentShader); // this is what moves your object
 
     // light Shader (basic white color shader)
-    // Shader lightShader("Shaders/flatShader.vert", "Shaders/flatShader.frag");
-    Shader lightShader("Shaders/depthShader.vert", "Shaders/depthShader.frag");
+    Shader lightShader("Shaders/flatShader.vert", "Shaders/flatShader.frag");
+    // Shader lightShader("Shaders/depthShader.vert", "Shaders/depthShader.frag");
 
     // I had to change this to position,normal,uv,color using google sheets!
     float cube[] = {
