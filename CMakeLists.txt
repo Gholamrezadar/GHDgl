@@ -68,7 +68,10 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         glad
         stb_image
         glfw
-        ${CMAKE_SOURCE_DIR}/vendor/assimp/lib/assimp-vc143-mtd.lib # Note: Change to the assimp.lib you built using your own compiler!
+        # Windows:
+        # ${CMAKE_SOURCE_DIR}/vendor/assimp/lib/assimp-vc143-mtd.lib # Note: Change to the assimp.lib you built using your own compiler!
+        # Linux:
+        ${CMAKE_SOURCE_DIR}/vendor/assimp/lib/libassimp.so.6
         ${GLFW_LIBRARIES}
         ${OPENGL_LIBRARIES}
 )
@@ -90,7 +93,10 @@ add_custom_command(
 # copy assimp-vc143-mtd.dll into the build directory (Note: Change to the assimp.dll you built using your own compiler!)
 add_custom_command(
     TARGET ${PROJECT_NAME} PRE_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/vendor/assimp/lib/assimp-vc143-mtd.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    # Windows:
+    # COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/vendor/assimp/lib/assimp-vc143-mtd.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    # Linux: 
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/vendor/assimp/lib/libassimp.so.6 $<TARGET_FILE_DIR:${PROJECT_NAME}>
 )
 
 

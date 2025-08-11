@@ -50,7 +50,8 @@ int initialization(GLFWwindow *&window, int width, int height, const char *title
     glfwMakeContextCurrent(window);
     
     // Disable Vsync
-    glfwSwapInterval(0);
+    // To enable Vsync, set the value to 1
+    glfwSwapInterval(1);
 
     // Initialize GLAD
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))

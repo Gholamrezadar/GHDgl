@@ -1,4 +1,4 @@
-#include "mygui.h"
+#include "Mygui.h"
 
 MyGUI3::MyGUI3()
 {

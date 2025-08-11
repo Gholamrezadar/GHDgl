@@ -17,11 +17,11 @@ Currently tested on Windows 10 (Visual Studio 2022)
 - CMake
 - OpenGL
 - GLFW 3
-- glad 
-- glm 
-- stb_image 
+- glad
+- glm
+- stb_image
 - imgui (Docking)
-- assimp 
+- assimp
 
 ## Features
 

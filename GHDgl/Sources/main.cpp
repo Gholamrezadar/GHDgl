@@ -22,7 +22,7 @@
 #include "VBO.h"
 #include "EBO.h"
 #include "utils.h"
-#include "mygui.h"
+#include "Mygui.h"
 #include "Mesh.h"
 #include "Model.h"
 
