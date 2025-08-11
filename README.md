@@ -55,6 +55,12 @@ cmake --build .
 
 ## Dev Log
 
+### 22. Depth Testing
+
+Here is after changing the depth test func to `GL_ALWAYS`. Displaying the fragments based on the order they were drawn.
+
+![depth_testing_always](demos/depth_func_always.png)
+
 ### 21. Blinn-Phong Shading
 
 Implemented blinn-phong shading. here is the before after
@@ -64,7 +70,13 @@ Implemented blinn-phong shading. here is the before after
 
 Convert the non-linear `gl_FragCoord.z` to linear and visualize it. Visit https://github.com/Gholamrezadar/GHDgl/commit/9f066b032e3883c3d11bd801105f39f8600aa53a to view it.
 
+Linear Depth:
+
 ![depth_viz](demos/linear_depth.png)
+
+Non-Linear (Raw) Depth:
+
+![raw_depth_viz](demos/nonlinear_depth.png)
 
 ### 19. Model Loading Part 2
 
