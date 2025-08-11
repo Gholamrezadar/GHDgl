@@ -92,8 +92,8 @@ int main() {
     currentShader.uniform_3f("pointLights[0].position", pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
     currentShader.uniform_1f("pointLights[0].constant", 1.0f);
     currentShader.uniform_1f("pointLights[0].linear", 0.3f);
-    currentShader.uniform_1f("pointLights[0].quadratic", 0.1f);
-    currentShader.uniform_3f("pointLights[0].ambient", 0.6f, 0.6f, 0.6f);
+    currentShader.uniform_1f("pointLights[0].quadratic", 0.4f);
+    currentShader.uniform_3f("pointLights[0].ambient", 0.4f, 0.4f, 0.4f);
     currentShader.uniform_3f("pointLights[0].diffuse", pointLightColors[0].x, pointLightColors[0].y, pointLightColors[0].z);
     currentShader.uniform_3f("pointLights[0].specular", pointLightColors[0].x, pointLightColors[0].y, pointLightColors[0].z);
 
@@ -612,6 +612,18 @@ int main() {
     const char* white_specular_image_address = "Images/white_specular.png";
     Texturee white_specular_texture(white_specular_image_address, GL_TEXTURE_2D, GL_TEXTURE1, GL_RGBA, GL_UNSIGNED_BYTE);
 
+    const char* veneer_image_address = "Images/oak_veneer_01_diff_1k.jpg";
+    Texturee veneer_texture(veneer_image_address, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
+
+    const char* veneer_spec_image_address = "Images/oak_veneer_01_spec_1k.jpg";
+    Texturee veneer_spec_texture(veneer_spec_image_address, GL_TEXTURE_2D, GL_TEXTURE1, GL_RGB, GL_UNSIGNED_BYTE);
+
+    const char* floor_image_address = "Images/rubber_tiles_diff_2k.jpg";
+    Texturee floor_texture(floor_image_address, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
+
+    const char* floor_spec_image_address = "Images/rubber_tiles_spec_2k.jpg";
+    Texturee floor_spec_texture(floor_spec_image_address, GL_TEXTURE_2D, GL_TEXTURE1, GL_RGB, GL_UNSIGNED_BYTE);
+
     MyGUI3 gui;
 
     // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
@@ -626,6 +638,9 @@ int main() {
     // load models
     // -----------
     Model ourModel("Models/suzanne.obj");
+    Model cubePileModel("Models/cubes_pile.obj");
+    Model cubePilePlaneModel("Models/cubes_pile_plane.obj");
+    Model cubePileSuzanneModel("Models/cubes_pile_suzanne.obj");
     // Model ourModel("C:\\Users\\ghd\\Downloads\\backpack\\backpack.obj");
 
     // draw in wireframe
@@ -715,7 +730,7 @@ int main() {
         }
 
         // Render Culled Box and Bunny inside Scene
-        if (true) {
+        if (false) {
             container_texture.bind(GL_TEXTURE0);
             container_specular_texture.bind(GL_TEXTURE1);
             currentShader.use();
@@ -749,6 +764,75 @@ int main() {
                 currentShader.uniform_mat4("model", glm::value_ptr(model));
                 camera.Matrix(currentShader);
                 ourModel.Draw(currentShader);
+            }
+        }
+
+        // Cubes Pile Scene
+        if (true) {
+            container_texture.bind(GL_TEXTURE0);
+            container_specular_texture.bind(GL_TEXTURE1);
+            currentShader.use();
+
+            float scaleFactor = 0.04f;
+            float zRotation = 45.0f;
+
+            // Plane
+            {
+                floor_texture.bind(GL_TEXTURE0);
+                floor_spec_texture.bind(GL_TEXTURE1);
+                currentShader.use();
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::scale(model, glm::vec3(scaleFactor));      // it's a bit too big for our scene, so scale it down
+                model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
+                currentShader.uniform_mat4("model", glm::value_ptr(model));
+                camera.Matrix(currentShader);
+                cubePilePlaneModel.Draw(currentShader);
+            }
+
+            // Cubes Pile
+            {
+                veneer_texture.bind(GL_TEXTURE0);
+                veneer_spec_texture.bind(GL_TEXTURE1);
+                currentShader.use();
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::scale(model, glm::vec3(scaleFactor));      // it's a bit too big for our scene, so scale it down
+                model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
+                currentShader.uniform_mat4("model", glm::value_ptr(model));
+                camera.Matrix(currentShader);
+                cubePileModel.Draw(currentShader);
+            }
+
+            // Suzanne
+            {
+                white_texture.bind(GL_TEXTURE0);
+                white_specular_texture.bind(GL_TEXTURE1);
+                currentShader.use();
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::scale(model, glm::vec3(scaleFactor));      // it's a bit too big for our scene, so scale it down
+                model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
+                currentShader.uniform_mat4("model", glm::value_ptr(model));
+                camera.Matrix(currentShader);
+                cubePileSuzanneModel.Draw(currentShader);
+            }
+
+            // Lights
+            {
+                VAO1.bind();
+                VBO1.bind();
+                float lightScale = 0.03f;
+                for(int i = 0; i < NR_POINT_LIGHTS; i++) {
+                    // light matrix
+                    glm::vec3 lightPos = pointLightPositions[i];
+                    glm::vec3 lightColor = pointLightColors[i];
+                    glm::mat4 light_model = glm::mat4(1.0f);
+                    light_model = glm::translate(light_model, lightPos);
+                    light_model = glm::scale(light_model, glm::vec3(lightScale, lightScale, lightScale));
+                    lightShader.use();
+                    lightShader.uniform_3f("color", pointLightColors[i].x, pointLightColors[i].y, pointLightColors[i].z);
+                    lightShader.uniform_mat4("model", glm::value_ptr(light_model));
+                    camera.Matrix(lightShader);
+                    glDrawArrays(GL_TRIANGLES, 0, 36);
+                }
             }
         }
 

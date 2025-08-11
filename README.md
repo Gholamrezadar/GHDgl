@@ -55,6 +55,16 @@ cmake --build .
 
 ## Dev Log
 
+### 24. A new Scene (Cubes Pile)
+
+Implemented a new scene with a plane and a bunch of cubes for upcoming examples.
+
+![cubes_pile](demos/piles_scene.png)
+
+Blender viewport for reference:
+
+![cubes_pile](demos/cube_pile_blender_reference.jpg)
+
 ### 23. Culling
 
 Implemented culling.
