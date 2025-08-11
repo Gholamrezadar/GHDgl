@@ -769,6 +769,10 @@ int main() {
 
         // Cubes Pile Scene
         if (true) {
+            // white texture override
+            // white_texture.bind(GL_TEXTURE0);
+            // white_specular_texture.bind(GL_TEXTURE1);
+
             container_texture.bind(GL_TEXTURE0);
             container_specular_texture.bind(GL_TEXTURE1);
             currentShader.use();

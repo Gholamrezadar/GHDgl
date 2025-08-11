@@ -61,9 +61,13 @@ Implemented a new scene with a plane and a bunch of cubes for upcoming examples.
 
 ![cubes_pile](demos/piles_scene.png)
 
-Blender viewport for reference:
+![cubes_pile_white](demos/piles_scene_white.png)
 
-![cubes_pile](demos/cube_pile_blender_reference.jpg)
+Blender viewport for reference (😪):
+
+![cubes_pile_blender](demos/cube_pile_blender_reference.jpg)
+
+![cubes_pile_blender_white](demos/piles_scene_blender_white.png)
 
 ### 23. Culling
 
