@@ -55,6 +55,14 @@ cmake --build .
 
 ## Dev Log
 
+### 25. Made the scene better
+
+Changed some lighting values and tweaked some textures. Also replaced suzanne with smoother one.
+
+![cubes_pile_suzanne_smooth](demos/piles_scene_better_lighting.png)
+
+![cubes_pile_suzanne_smooth](demos/piles_scene_better_lighting_white.png)
+
 ### 24. A new Scene (Cubes Pile)
 
 Implemented a new scene with a plane and a bunch of cubes for upcoming examples.

@@ -66,18 +66,15 @@ int main() {
         return flag;
 
     ///////////////////////////// Scene Setup /////////////////////////////
+    // X: Horizontal, Y: Vertical, Z: Depth
 
     // Model matrix
     glm::mat4 model = glm::mat4(1.0f);
 
     // Camera
     Camera camera(SCR_WIDTH, SCR_HEIGHT, glm::vec3(0.0f, 0.0f, 0.0f), 45.0f, 0.1f, 100.0f);
-    // camera.Position += glm::vec3(0.0f, 0.0f, 3.0f);
-    camera.Position += glm::vec3(1.5f, 1.5f, 1.5f);
-    camera.Position += glm::vec3(0.0f, -0.35f, 0.0f);
-    camera.Orientation = glm::rotate(camera.Orientation, glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    camera.Orientation = glm::rotate(camera.Orientation, glm::radians(-35.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    // look at the light
+    camera.Position += glm::vec3(0.64f, 0.40f, 1.58f);
+    camera.Orientation = glm::rotate(camera.Orientation, glm::radians(32.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     // Box Shader
     Shader currentShader("Shaders/texturedPhongShader.vert", "Shaders/texturedPhongShader.frag");
@@ -89,14 +86,16 @@ int main() {
     currentShader.uniform_3f("viewPos", camera.Position.x, camera.Position.y, camera.Position.z);
 
     // Light settings
+    // blue light
     currentShader.uniform_3f("pointLights[0].position", pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
     currentShader.uniform_1f("pointLights[0].constant", 1.0f);
     currentShader.uniform_1f("pointLights[0].linear", 0.3f);
-    currentShader.uniform_1f("pointLights[0].quadratic", 0.4f);
-    currentShader.uniform_3f("pointLights[0].ambient", 0.4f, 0.4f, 0.4f);
+    currentShader.uniform_1f("pointLights[0].quadratic", 0.44f);
+    currentShader.uniform_3f("pointLights[0].ambient", 0.0f, 0.0f, 0.0f);
     currentShader.uniform_3f("pointLights[0].diffuse", pointLightColors[0].x, pointLightColors[0].y, pointLightColors[0].z);
     currentShader.uniform_3f("pointLights[0].specular", pointLightColors[0].x, pointLightColors[0].y, pointLightColors[0].z);
 
+    // red light
     currentShader.uniform_3f("pointLights[1].position", pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);
     currentShader.uniform_1f("pointLights[1].constant", 1.0f);
     currentShader.uniform_1f("pointLights[1].linear", 0.3f);
@@ -105,14 +104,17 @@ int main() {
     currentShader.uniform_3f("pointLights[1].diffuse", pointLightColors[1].x, pointLightColors[1].y, pointLightColors[1].z);
     currentShader.uniform_3f("pointLights[1].specular", pointLightColors[1].x, pointLightColors[1].y, pointLightColors[1].z);
 
+    // white light also has ambient
     currentShader.uniform_3f("pointLights[2].position", pointLightPositions[2].x, pointLightPositions[2].y, pointLightPositions[2].z);
-    currentShader.uniform_1f("pointLights[2].constant", 1.0f);
+    currentShader.uniform_1f("pointLights[2].constant", 1.3f);
     currentShader.uniform_1f("pointLights[2].linear", 0.3f);
     currentShader.uniform_1f("pointLights[2].quadratic", 0.44f);
-    currentShader.uniform_3f("pointLights[2].ambient", 0.0f, 0.0f, 0.0f);  // only the first light has ambient
+    float ambient = 0.35f;
+    currentShader.uniform_3f("pointLights[2].ambient", ambient, ambient, ambient);
     currentShader.uniform_3f("pointLights[2].diffuse", pointLightColors[2].x, pointLightColors[2].y, pointLightColors[2].z);
     currentShader.uniform_3f("pointLights[2].specular", pointLightColors[2].x, pointLightColors[2].y, pointLightColors[2].z);
 
+    // green light
     currentShader.uniform_3f("pointLights[3].position", pointLightPositions[3].x, pointLightPositions[3].y, pointLightPositions[3].z);
     currentShader.uniform_1f("pointLights[3].constant", 1.0f);
     currentShader.uniform_1f("pointLights[3].linear", 0.3f);
@@ -122,7 +124,7 @@ int main() {
     currentShader.uniform_3f("pointLights[3].specular", pointLightColors[3].x, pointLightColors[3].y, pointLightColors[3].z);
 
     // Material settings
-    currentShader.uniform_3f("material.ambient", 1.0f, 0.5f, 0.31f);
+    currentShader.uniform_3f("material.ambient", ambient, ambient, ambient);
     currentShader.uniform_int("material.diffuse", 0);  // set to texture unit 0
     currentShader.uniform_int("material.specular", 1);
     currentShader.uniform_1f("material.shininess", 64.0f);
@@ -133,406 +135,6 @@ int main() {
     Shader lightShader("Shaders/flatShader.vert", "Shaders/flatShader.frag");
     // Shader lightShader("Shaders/depthShader.vert", "Shaders/depthShader.frag");
 
-    // I had to change this to position,normal,uv,color using google sheets!
-    float badcube[] = {
-        // positions          // colors           // texture coords // normals
-        -0.5f,
-        -0.5f,
-        -0.5f,
-        0.0f,
-        0.0f,
-        -1.0f,
-        0.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        0.5f,
-        -0.5f,
-        -0.5f,
-        0.0f,
-        0.0f,
-        -1.0f,
-        1.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        0.5f,
-        0.5f,
-        -0.5f,
-        0.0f,
-        0.0f,
-        -1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        0.5f,
-        0.5f,
-        -0.5f,
-        0.0f,
-        0.0f,
-        -1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        -0.5f,
-        0.5f,
-        -0.5f,
-        0.0f,
-        0.0f,
-        -1.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        -0.5f,
-        -0.5f,
-        -0.5f,
-        0.0f,
-        0.0f,
-        -1.0f,
-        0.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        -0.5f,
-        -0.5f,
-        0.5f,
-        0.0f,
-        0.0f,
-        1.0f,
-        0.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        0.5f,
-        -0.5f,
-        0.5f,
-        0.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        0.5f,
-        0.5f,
-        0.5f,
-        0.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        0.5f,
-        0.5f,
-        0.5f,
-        0.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        -0.5f,
-        0.5f,
-        0.5f,
-        0.0f,
-        0.0f,
-        1.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        -0.5f,
-        -0.5f,
-        0.5f,
-        0.0f,
-        0.0f,
-        1.0f,
-        0.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        -0.5f,
-        0.5f,
-        0.5f,
-        -1.0f,
-        0.0f,
-        0.0f,
-        1.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        -0.5f,
-        0.5f,
-        -0.5f,
-        -1.0f,
-        0.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        -0.5f,
-        -0.5f,
-        -0.5f,
-        -1.0f,
-        0.0f,
-        0.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        -0.5f,
-        -0.5f,
-        -0.5f,
-        -1.0f,
-        0.0f,
-        0.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        -0.5f,
-        -0.5f,
-        0.5f,
-        -1.0f,
-        0.0f,
-        0.0f,
-        0.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        -0.5f,
-        0.5f,
-        0.5f,
-        -1.0f,
-        0.0f,
-        0.0f,
-        1.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        0.5f,
-        0.5f,
-        0.5f,
-        1.0f,
-        0.0f,
-        0.0f,
-        1.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        0.5f,
-        0.5f,
-        -0.5f,
-        1.0f,
-        0.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        0.5f,
-        -0.5f,
-        -0.5f,
-        1.0f,
-        0.0f,
-        0.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        0.5f,
-        -0.5f,
-        -0.5f,
-        1.0f,
-        0.0f,
-        0.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        0.5f,
-        -0.5f,
-        0.5f,
-        1.0f,
-        0.0f,
-        0.0f,
-        0.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        0.5f,
-        0.5f,
-        0.5f,
-        1.0f,
-        0.0f,
-        0.0f,
-        1.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        -0.5f,
-        -0.5f,
-        -0.5f,
-        0.0f,
-        -1.0f,
-        0.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        0.5f,
-        -0.5f,
-        -0.5f,
-        0.0f,
-        -1.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        0.5f,
-        -0.5f,
-        0.5f,
-        0.0f,
-        -1.0f,
-        0.0f,
-        1.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        0.5f,
-        -0.5f,
-        0.5f,
-        0.0f,
-        -1.0f,
-        0.0f,
-        1.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        -0.5f,
-        -0.5f,
-        0.5f,
-        0.0f,
-        -1.0f,
-        0.0f,
-        0.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        -0.5f,
-        -0.5f,
-        -0.5f,
-        0.0f,
-        -1.0f,
-        0.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        -0.5f,
-        0.5f,
-        -0.5f,
-        0.0f,
-        1.0f,
-        0.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        0.5f,
-        0.5f,
-        -0.5f,
-        0.0f,
-        1.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        0.5f,
-        0.5f,
-        0.5f,
-        0.0f,
-        1.0f,
-        0.0f,
-        1.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        0.5f,
-        0.5f,
-        0.5f,
-        0.0f,
-        1.0f,
-        0.0f,
-        1.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        -0.5f,
-        0.5f,
-        0.5f,
-        0.0f,
-        1.0f,
-        0.0f,
-        0.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        -0.5f,
-        0.5f,
-        -0.5f,
-        0.0f,
-        1.0f,
-        0.0f,
-        0.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-        1.0f,
-    };
 
     float cube[] = {
     // positions        // normals          // texcoords // colors
@@ -615,10 +217,10 @@ int main() {
     const char* veneer_image_address = "Images/oak_veneer_01_diff_1k.jpg";
     Texturee veneer_texture(veneer_image_address, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
 
-    const char* veneer_spec_image_address = "Images/oak_veneer_01_spec_1k.jpg";
+    const char* veneer_spec_image_address = "Images/oak_veneer_01_spec_1k_extreme.jpg";
     Texturee veneer_spec_texture(veneer_spec_image_address, GL_TEXTURE_2D, GL_TEXTURE1, GL_RGB, GL_UNSIGNED_BYTE);
 
-    const char* floor_image_address = "Images/rubber_tiles_diff_2k.jpg";
+    const char* floor_image_address = "Images/rubber_tiles_diff_2k_invert.jpg";
     Texturee floor_texture(floor_image_address, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
 
     const char* floor_spec_image_address = "Images/rubber_tiles_spec_2k.jpg";
@@ -640,7 +242,7 @@ int main() {
     Model ourModel("Models/suzanne.obj");
     Model cubePileModel("Models/cubes_pile.obj");
     Model cubePilePlaneModel("Models/cubes_pile_plane.obj");
-    Model cubePileSuzanneModel("Models/cubes_pile_suzanne.obj");
+    Model cubePileSuzanneModel("Models/cubes_pile_suzanne_smooth.obj");
     // Model ourModel("C:\\Users\\ghd\\Downloads\\backpack\\backpack.obj");
 
     // draw in wireframe
@@ -673,7 +275,7 @@ int main() {
         /////////////////////////////////// Draw ///////////////////////////////////
 
         // Clear background
-        glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+        glClearColor(0.05f, 0.07f, 0.09f, 1.0f);
         // gui.log("glClearColor");
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -783,6 +385,7 @@ int main() {
             // Plane
             {
                 floor_texture.bind(GL_TEXTURE0);
+                // white_texture.bind(GL_TEXTURE0);
                 floor_spec_texture.bind(GL_TEXTURE1);
                 currentShader.use();
                 glm::mat4 model = glm::mat4(1.0f);
@@ -796,6 +399,7 @@ int main() {
             // Cubes Pile
             {
                 veneer_texture.bind(GL_TEXTURE0);
+                // white_texture.bind(GL_TEXTURE0);
                 veneer_spec_texture.bind(GL_TEXTURE1);
                 currentShader.use();
                 glm::mat4 model = glm::mat4(1.0f);
