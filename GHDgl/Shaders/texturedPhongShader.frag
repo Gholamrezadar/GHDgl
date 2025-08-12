@@ -34,7 +34,7 @@ in vec2 TexCoords;
 in vec3 Normal;
 in vec3 FragPos;
 
-vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
+vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec2 uv)
 {
     vec3 lightDir = normalize(light.position - fragPos);
 
@@ -55,9 +55,9 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     light.quadratic * (distance * distance));
 
     // combine results
-    vec3 ambient  = light.ambient  * vec3(texture(material.diffuse, TexCoords));
-    vec3 diffuse  = light.diffuse  * diff * vec3(texture(material.diffuse, TexCoords));
-    vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords));
+    vec3 ambient  = light.ambient  * vec3(texture(material.diffuse, uv));
+    vec3 diffuse  = light.diffuse  * diff * vec3(texture(material.diffuse, uv));
+    vec3 specular = light.specular * spec * vec3(texture(material.specular, uv));
 
     // ambient *= attenuation;
     specular *= attenuation;
@@ -67,13 +67,18 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 
 void main()
 {
+    // UV mapping
+    vec2 uv = TexCoords;
+    // tiling
+    uv *= vec2(0.1, 0.1);
+
     // calculate some useful vectors
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPos - FragPos);
 
     vec3 result = vec3(0.0, 0.0, 0.0);
     for(int i = 0; i < NR_POINT_LIGHTS; i++) {
-        result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
+        result += CalcPointLight(pointLights[i], norm, FragPos, viewDir, uv);
     }
 
     //result = vec3(max(dot(norm, viewDir), 0.0));

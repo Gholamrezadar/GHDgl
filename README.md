@@ -55,6 +55,18 @@ cmake --build .
 
 ## Dev Log
 
+### 26. Blending
+
+Implemented a new scene with glass windows on top of each other.
+
+![blending](demos/blending_demo.png)
+
+But it only works if you look through the windows in order they were drawn.
+
+![blending](demos/blending_demo_bad.png)
+
+TODO: Sort by depth
+
 ### 25. Made the scene better
 
 Changed some lighting values and tweaked some textures. Also replaced suzanne with smoother one.

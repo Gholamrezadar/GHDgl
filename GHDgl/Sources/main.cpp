@@ -85,6 +85,13 @@ int main() {
     currentShader.uniform_mat4("model", glm::value_ptr(model));
     currentShader.uniform_3f("viewPos", camera.Position.x, camera.Position.y, camera.Position.z);
 
+    Shader glassShader("Shaders/glassShader.vert", "Shaders/glassShader.frag");
+    glassShader.use();
+    glassShader.uniform_3f("color", 0.0f, 1.0f, 0.0f);
+    glassShader.uniform_mat4("model", glm::value_ptr(model));
+    glassShader.uniform_3f("viewPos", camera.Position.x, camera.Position.y, camera.Position.z);
+    glassShader.uniform_int("texture1", 0);
+
     // Light settings
     // blue light
     currentShader.uniform_3f("pointLights[0].position", pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
@@ -226,6 +233,9 @@ int main() {
     const char* floor_spec_image_address = "Images/rubber_tiles_spec_2k.jpg";
     Texturee floor_spec_texture(floor_spec_image_address, GL_TEXTURE_2D, GL_TEXTURE1, GL_RGB, GL_UNSIGNED_BYTE);
 
+    const char* window_image_address = "Images/blending_transparent_window.png";
+    Texturee window_texture(window_image_address, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+
     MyGUI3 gui;
 
     // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
@@ -236,6 +246,8 @@ int main() {
     glEnable(GL_DEPTH_TEST);
     // glDepthFunc(GL_ALWAYS);
     // glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  
 
     // load models
     // -----------
@@ -469,19 +481,21 @@ int main() {
 
             // Glass windows on top of each other
             {
-                float windowScale = 0.003f;
-                veneer_texture.bind(GL_TEXTURE0);
-                veneer_spec_texture.bind(GL_TEXTURE1);
-                currentShader.use();
+                float windowScale = 0.00300f;
+                window_texture.bind(GL_TEXTURE0);
+                white_specular_texture.bind(GL_TEXTURE1);
+                glassShader.use();
                 for(int i=0; i<10; i++) {
                     glm::mat4 model = glm::mat4(1.0f);
                     model = glm::scale(model, glm::vec3(1.0f, -1.0f, 1.0f));
                     model = glm::scale(model, glm::vec3(windowScale));
                     model = glm::translate(model, glm::vec3((i+1) * 15.0f, (i+1) * -15.0f, 0.0f));
                     model = glm::translate(model, glm::vec3(-100.0f, 0.0f, 0.0f));
-                    currentShader.uniform_mat4("model", glm::value_ptr(model));
-                    camera.Matrix(currentShader);
-                    cubePilePlaneModel.Draw(currentShader);
+                    glassShader.uniform_mat4("model", glm::value_ptr(model));
+                    float tiling = 0.1f * 0.25f;
+                    glassShader.uniform_2f("tiling", tiling, tiling);
+                    camera.Matrix(glassShader);
+                    cubePilePlaneModel.Draw(glassShader);
                 }
             }
             
