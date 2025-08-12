@@ -370,7 +370,7 @@ int main() {
         }
 
         // Cubes Pile Scene
-        if (true) {
+        if (false) {
             // white texture override
             // white_texture.bind(GL_TEXTURE0);
             // white_specular_texture.bind(GL_TEXTURE1);
@@ -444,6 +444,70 @@ int main() {
             }
         }
 
+        // Blending scene
+        if (true) {
+            container_texture.bind(GL_TEXTURE0);
+            container_specular_texture.bind(GL_TEXTURE1);
+            currentShader.use();
+
+            float scaleFactor = 0.04f;
+            float zRotation = 45.0f;
+
+            // Plane
+            {
+                floor_texture.bind(GL_TEXTURE0);
+                // white_texture.bind(GL_TEXTURE0);
+                floor_spec_texture.bind(GL_TEXTURE1);
+                currentShader.use();
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::scale(model, glm::vec3(scaleFactor));      // it's a bit too big for our scene, so scale it down
+                model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
+                currentShader.uniform_mat4("model", glm::value_ptr(model));
+                camera.Matrix(currentShader);
+                cubePilePlaneModel.Draw(currentShader);
+            }
+
+            // Glass windows on top of each other
+            {
+                float windowScale = 0.003f;
+                veneer_texture.bind(GL_TEXTURE0);
+                veneer_spec_texture.bind(GL_TEXTURE1);
+                currentShader.use();
+                for(int i=0; i<10; i++) {
+                    glm::mat4 model = glm::mat4(1.0f);
+                    model = glm::scale(model, glm::vec3(1.0f, -1.0f, 1.0f));
+                    model = glm::scale(model, glm::vec3(windowScale));
+                    model = glm::translate(model, glm::vec3((i+1) * 15.0f, (i+1) * -15.0f, 0.0f));
+                    currentShader.uniform_mat4("model", glm::value_ptr(model));
+                    camera.Matrix(currentShader);
+                    cubePilePlaneModel.Draw(currentShader);
+                }
+            }
+            
+            // Lights
+            {
+                VAO1.bind();
+                VBO1.bind();
+                float lightScale = 0.03f;
+                for(int i = 0; i < NR_POINT_LIGHTS; i++) {
+                    // light matrix
+                    glm::vec3 lightPos = pointLightPositions[i];
+                    glm::vec3 lightColor = pointLightColors[i];
+                    glm::mat4 light_model = glm::mat4(1.0f);
+                    light_model = glm::translate(light_model, lightPos);
+                    light_model = glm::scale(light_model, glm::vec3(lightScale, lightScale, lightScale));
+                    lightShader.use();
+                    lightShader.uniform_3f("color", pointLightColors[i].x, pointLightColors[i].y, pointLightColors[i].z);
+                    lightShader.uniform_mat4("model", glm::value_ptr(light_model));
+                    camera.Matrix(lightShader);
+                    glDrawArrays(GL_TRIANGLES, 0, 36);
+                }
+            }
+        }
+
+        if (true) {
+
+        }
         //////////////////////////////////// UI ////////////////////////////////////
         gui.update(currentShader);
 
