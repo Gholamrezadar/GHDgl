@@ -478,6 +478,7 @@ int main() {
                     model = glm::scale(model, glm::vec3(1.0f, -1.0f, 1.0f));
                     model = glm::scale(model, glm::vec3(windowScale));
                     model = glm::translate(model, glm::vec3((i+1) * 15.0f, (i+1) * -15.0f, 0.0f));
+                    model = glm::translate(model, glm::vec3(-100.0f, 0.0f, 0.0f));
                     currentShader.uniform_mat4("model", glm::value_ptr(model));
                     camera.Matrix(currentShader);
                     cubePilePlaneModel.Draw(currentShader);
