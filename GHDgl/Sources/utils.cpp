@@ -1,17 +1,16 @@
 #include "utils.h"
+
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
 // Callback function for handling window resize
-void framebuffer_size_callback(GLFWwindow *window, int width, int height)
-{
+void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
 // Callback function for ImGui color picker
-void ColorPickerCallback(const ImVec4 &color, void *userData)
-{
+void ColorPickerCallback(const ImVec4 &color, void *userData) {
     // Cast the userData to the desired data type
     glm::vec3 *triangleColor = static_cast<glm::vec3 *>(userData);
 
@@ -21,12 +20,9 @@ void ColorPickerCallback(const ImVec4 &color, void *userData)
     triangleColor->b = color.z;
 }
 
-int initialization(GLFWwindow *&window, int width, int height, const char *title)
-{
-
+int initialization(GLFWwindow *&window, int width, int height, const char *title, int msaa) {
     // Initialize GLFW
-    if (!glfwInit())
-    {
+    if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW" << std::endl;
         return -1;
     }
@@ -35,27 +31,34 @@ int initialization(GLFWwindow *&window, int width, int height, const char *title
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    
+    // Enable MSAA
+    if (msaa == 4 || msaa == 8 || msaa == 16) {
+        glfwWindowHint(GLFW_SAMPLES, msaa);
+    } else if (msaa != 0) {
+        std::cerr << "MSAA value must be 0(off), 4, 8 or 16" << std::endl;
+        glfwTerminate();
+        return -1;
+    }
 
     // Create a GLFW window
     window = glfwCreateWindow(width, height, title, nullptr, nullptr);
-    if (window == nullptr)
-    {
+    if (window == nullptr) {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return -1;
     }
-    
-    
+
     // Make the OpenGL context of the window the current one
     glfwMakeContextCurrent(window);
-    
+
+
     // Disable Vsync
     // To enable Vsync, set the value to 1
     glfwSwapInterval(1);
 
     // Initialize GLAD
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cerr << "Failed to initialize GLAD" << std::endl;
         glfwTerminate();
         return -1;
@@ -78,8 +81,7 @@ int initialization(GLFWwindow *&window, int width, int height, const char *title
     return 0;
 }
 
-ImGuiIO &initializeImGui(GLFWwindow *window)
-{
+ImGuiIO &initializeImGui(GLFWwindow *window) {
     // Initialize ImGui
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -102,8 +104,7 @@ ImGuiIO &initializeImGui(GLFWwindow *window)
     return io;
 }
 
-void embraceTheDarkness()
-{
+void embraceTheDarkness() {
     ImVec4 *colors = ImGui::GetStyle().Colors;
     colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
     colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
@@ -186,15 +187,13 @@ void embraceTheDarkness()
     style.TabRounding = 4;
 }
 
-void ImGuiNewFrame()
-{
+void ImGuiNewFrame() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 }
 
-void ImGuiCleanup()
-{
+void ImGuiCleanup() {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();

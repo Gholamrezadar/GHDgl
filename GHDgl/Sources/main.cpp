@@ -61,7 +61,8 @@ int main() {
     //  Initialization and GLFW window creation
     GLFWwindow* window;
     int flag;
-    flag = initialization(window, SCR_WIDTH, SCR_HEIGHT, "GHDgl");
+    constexpr int msaa = 8;
+    flag = initialization(window, SCR_WIDTH, SCR_HEIGHT, "GHDgl", msaa);
     if (flag == -1)
         return flag;
 

@@ -14,7 +14,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 // Callback function for ImGui color picker
 void ColorPickerCallback(const ImVec4 &color, void *userData);
 
-int initialization(GLFWwindow*& window, int width, int height, const char* title);
+int initialization(GLFWwindow*& window, int width, int height, const char* title, int msaa);
 
 void embraceTheDarkness();
 

@@ -55,6 +55,12 @@ cmake --build .
 
 ## Dev Log
 
+### 28. Enable MSAA
+
+Added MSAA support.
+
+![msaa](demos/msaa_8x.png)
+
 ### 27. Depth Sorting
 
 Sorted the windows by distance from the camera to make sure they are drawn in the correct order. but still doesn't work perfectly.
