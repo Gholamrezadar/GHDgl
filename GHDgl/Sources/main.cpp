@@ -291,7 +291,7 @@ int main() {
     // draw in wireframe
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-     // Framebuffer shenanigans
+    // Framebuffer shenanigans
     unsigned int fbo;
     unsigned int fullscreenColorTex;
     unsigned int fullscreenDepthTex;
@@ -325,6 +325,31 @@ int main() {
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    // MSAA framebuffer
+    unsigned int fboMSAA;
+    unsigned int colorMSAA;
+    unsigned int depthMSAA;
+
+    glGenFramebuffers(1, &fboMSAA);
+    glBindFramebuffer(GL_FRAMEBUFFER, fboMSAA);
+
+    // --- Color (multisampled texture) ---
+    glGenTextures(1, &colorMSAA);
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, colorMSAA);
+    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGBA8, SCR_WIDTH, SCR_HEIGHT, GL_TRUE);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, colorMSAA, 0);
+
+    // --- Depth (multisampled texture) ---
+    glGenTextures(1, &depthMSAA);
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, depthMSAA);
+    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_DEPTH_COMPONENT24, SCR_WIDTH, SCR_HEIGHT, GL_TRUE);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D_MULTISAMPLE, depthMSAA, 0);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "Error: MSAA Framebuffer not complete" << std::endl;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     // Main loop
     int frameNumber = 0;
     glm::vec3 oldCameraPos = camera.Position;
@@ -351,8 +376,8 @@ int main() {
 
         /////////////////////////////////// Draw ////////////////////////////////////
 
-        // Clear background
-        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+        // Pass 1: rendering with MSAA
+        glBindFramebuffer(GL_FRAMEBUFFER, fboMSAA);
         glViewport(0,0,SCR_WIDTH, SCR_HEIGHT);
         glEnable(GL_DEPTH_TEST);
         glClearColor(0.05f, 0.07f, 0.09f, 1.0f);
@@ -644,7 +669,19 @@ int main() {
             }
         }
 
-        // Full screen Pass
+
+        // Pass 2: Resolving the MSAA fbo into a normal one
+        {
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, fboMSAA);
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+            glBlitFramebuffer(0, 0, SCR_WIDTH, SCR_HEIGHT,
+                  0, 0, SCR_WIDTH, SCR_HEIGHT,
+                  GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+            
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        }
+
+        // Pass 3: Post Processing
         {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             glViewport(0,0,SCR_WIDTH, SCR_HEIGHT);

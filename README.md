@@ -3,8 +3,8 @@
 My personal OpenGL sandbox project.
 I plan to implement various OpenGL features and techniques in this project.
 
-![demo](demos/mesh_loading_final.png)
-Currently tested on Windows 10 (Visual Studio 2022)
+![demo](demos/effects_rgb_split.png)
+Currently tested on Windows 10 (Visual Studio 2022) and Ubuntu 22.04 (GCC)
 
 ## Dependencies
 
@@ -54,6 +54,18 @@ cmake --build .
 **NOTE**:  Also make sure to build `assimp.dll` and `assimp.lib` for you own system and place it in `GHDgl/vendor/assimp/lib`. if your files have different names, either rename them to match or change the corresponding names in `CMakeLists.txt` file.
 
 ## Dev Log
+
+## 30. Fullscreen Effects and MSAA
+
+This requires 3 framebuffers, a `fboMSAA`, a normal `fbo` and the `default(0)` one. We render to the MSAA FBO, then blit it to the normal one, and using that we use the image effect shader to render a fullscreen quad to the default FBO.
+
+With MSAA:
+
+![effects_msaa](demos/effects_bw_MSAA.png)
+
+Without MSAA:
+
+![effects_bw](demos/effects_bw.png)
 
 ## 29. Framebuffers and fullscreen Effects
 
