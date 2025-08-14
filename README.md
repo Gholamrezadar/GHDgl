@@ -55,6 +55,14 @@ cmake --build .
 
 ## Dev Log
 
+### 27. Depth Sorting
+
+Sorted the windows by distance from the camera to make sure they are drawn in the correct order. but still doesn't work perfectly.
+
+**4MB GIF**
+
+![depth_sorting](demos/GHDgl_depth_sorting.gif)
+
 ### 26. Blending
 
 Implemented a new scene with glass windows on top of each other.

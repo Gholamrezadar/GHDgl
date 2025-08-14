@@ -476,28 +476,9 @@ int main() {
                 model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
                 currentShader.uniform_mat4("model", glm::value_ptr(model));
                 camera.Matrix(currentShader);
-                cubePilePlaneModel.Draw(currentShader);
+                // cubePilePlaneModel.Draw(currentShader);
             }
 
-            // Glass windows on top of each other
-            {
-                float windowScale = 0.00300f;
-                window_texture.bind(GL_TEXTURE0);
-                white_specular_texture.bind(GL_TEXTURE1);
-                glassShader.use();
-                for(int i=0; i<10; i++) {
-                    glm::mat4 model = glm::mat4(1.0f);
-                    model = glm::scale(model, glm::vec3(1.0f, -1.0f, 1.0f));
-                    model = glm::scale(model, glm::vec3(windowScale));
-                    model = glm::translate(model, glm::vec3((i+1) * 15.0f, (i+1) * -15.0f, 0.0f));
-                    model = glm::translate(model, glm::vec3(-100.0f, 0.0f, 0.0f));
-                    glassShader.uniform_mat4("model", glm::value_ptr(model));
-                    float tiling = 0.1f * 0.25f;
-                    glassShader.uniform_2f("tiling", tiling, tiling);
-                    camera.Matrix(glassShader);
-                    cubePilePlaneModel.Draw(glassShader);
-                }
-            }
             
             // Lights
             {
@@ -518,11 +499,78 @@ int main() {
                     glDrawArrays(GL_TRIANGLES, 0, 36);
                 }
             }
+
+            vector<glm::mat4> windowModels;
+            float windowScale = 0.003f;
+            // Create a vector of positions for the windows
+            {
+                for(int i=0; i<10; i++) {
+                    glm::mat4 model = glm::mat4(1.0f);
+                    model = glm::scale(model, glm::vec3(1.0f, -1.0f, 1.0f));
+                    model = glm::scale(model, glm::vec3(windowScale));
+                    model = glm::translate(model,glm::vec3((i+1) * 15.0f-100.0f, (i+1) * -15.0f, 0.0f));
+                    windowModels.push_back(model);
+                }
+            }
+
+            {
+                VAO1.bind();
+                VBO1.bind();
+                float lightScale = 0.01f;
+                for(int i = 0; i < windowModels.size(); i++) {
+                    // light matrix
+                    // glm::vec3 lightPos = windowPositions[i];
+                    // glm::vec3 lightColor = pointLightColors[i];
+                    // glm::mat4 light_model = glm::mat4(1.0f);
+                    // light_model = glm::scale(light_model, glm::vec3(lightScale, lightScale, lightScale));
+                    // glm::mat4 light_model = windowModels[i];
+                    glm::vec3 worldPos = windowModels[i] * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+                    glm::vec3 lightPos = worldPos;
+                    glm::mat4 light_model = glm::translate(glm::mat4(1.0f), lightPos);
+                    light_model = glm::scale(light_model, glm::vec3(lightScale, lightScale, lightScale));
+                    lightShader.use();
+                    lightShader.uniform_3f("color", pointLightColors[0].x, pointLightColors[0].y, pointLightColors[0].z);
+                    lightShader.uniform_mat4("model", glm::value_ptr(light_model));
+                    camera.Matrix(lightShader);
+                    glDrawArrays(GL_TRIANGLES, 0, 36);
+                }
+            }
+
+
+            
+            // Sort the windows by distance from the camera
+            // std::sort(windowPositions.begin(), windowPositions.end(), [&camera](glm::vec3 a, glm::vec3 b) {
+            //     return glm::length(a - camera.Position) > glm::length(b - camera.Position);
+            // });
+            std::sort(windowModels.begin(), windowModels.end(),
+                [&camera](const glm::mat4& a, const glm::mat4& b) {
+                    glm::vec3 posA = glm::vec3(a[3]); // extract world position
+                    glm::vec3 posB = glm::vec3(b[3]);
+                    return glm::length(posA - camera.Position) > glm::length(posB - camera.Position);
+            });
+            
+            // print the distances between the windows and the camera for debugging
+            // for(int i=0; i<windowPositions.size(); i++) {
+            //     std::cout <<i<< "Pos: " << windowPositions[i].x << " " << windowPositions[i].y << " " << windowPositions[i].z << std::endl;
+            //     std::cout <<i<< "Dist:" <<glm::length(windowPositions[i] - camera.Position) << std::endl;
+            //     std::cout << std::endl;
+            // }
+            // Draw the windows in sorted order
+            {
+                window_texture.bind(GL_TEXTURE0);
+                white_specular_texture.bind(GL_TEXTURE1);
+                glassShader.use();
+                for(int i=0; i<windowModels.size(); i++) {
+                    glm::mat4 model = windowModels[i];
+                    glassShader.uniform_mat4("model", glm::value_ptr(model));
+                    float tiling = 0.1f * 0.25f;
+                    glassShader.uniform_2f("tiling", tiling, tiling);
+                    camera.Matrix(glassShader);
+                    cubePilePlaneModel.Draw(glassShader);
+                }
+            }
         }
 
-        if (true) {
-
-        }
         //////////////////////////////////// UI ////////////////////////////////////
         gui.update(currentShader);
 
