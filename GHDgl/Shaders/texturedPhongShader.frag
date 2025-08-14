@@ -28,6 +28,7 @@ uniform PointLight pointLights[NR_POINT_LIGHTS];
 uniform vec3 color;  // New uniform variable
 uniform sampler2D texture1;
 uniform vec3 viewPos; // Camera position
+uniform vec2 tiling;
 
 in vec3 vertexColor;
 in vec2 TexCoords;
@@ -70,7 +71,7 @@ void main()
     // UV mapping
     vec2 uv = TexCoords;
     // tiling
-    uv *= vec2(0.1, 0.1);
+    uv *= tiling;
 
     // calculate some useful vectors
     vec3 norm = normalize(Normal);

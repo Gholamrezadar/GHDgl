@@ -382,7 +382,7 @@ int main() {
         }
 
         // Cubes Pile Scene
-        if (false) {
+        if (true) {
             // white texture override
             // white_texture.bind(GL_TEXTURE0);
             // white_specular_texture.bind(GL_TEXTURE1);
@@ -393,9 +393,10 @@ int main() {
 
             float scaleFactor = 0.04f;
             float zRotation = 45.0f;
-
+            
             // Plane
             {
+                float tiling = 0.5f;
                 floor_texture.bind(GL_TEXTURE0);
                 // white_texture.bind(GL_TEXTURE0);
                 floor_spec_texture.bind(GL_TEXTURE1);
@@ -404,12 +405,14 @@ int main() {
                 model = glm::scale(model, glm::vec3(scaleFactor));      // it's a bit too big for our scene, so scale it down
                 model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
                 currentShader.uniform_mat4("model", glm::value_ptr(model));
+                currentShader.uniform_2f("tiling", tiling, tiling);
                 camera.Matrix(currentShader);
                 cubePilePlaneModel.Draw(currentShader);
             }
 
             // Cubes Pile
             {
+                float tiling = 1.00f;
                 veneer_texture.bind(GL_TEXTURE0);
                 // white_texture.bind(GL_TEXTURE0);
                 veneer_spec_texture.bind(GL_TEXTURE1);
@@ -418,12 +421,14 @@ int main() {
                 model = glm::scale(model, glm::vec3(scaleFactor));      // it's a bit too big for our scene, so scale it down
                 model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
                 currentShader.uniform_mat4("model", glm::value_ptr(model));
+                currentShader.uniform_2f("tiling", tiling, tiling);
                 camera.Matrix(currentShader);
                 cubePileModel.Draw(currentShader);
             }
 
             // Suzanne
             {
+                float tiling = 0.1f;;
                 white_texture.bind(GL_TEXTURE0);
                 white_specular_texture.bind(GL_TEXTURE1);
                 currentShader.use();
@@ -431,6 +436,7 @@ int main() {
                 model = glm::scale(model, glm::vec3(scaleFactor));      // it's a bit too big for our scene, so scale it down
                 model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
                 currentShader.uniform_mat4("model", glm::value_ptr(model));
+                currentShader.uniform_2f("tiling", tiling, tiling);
                 camera.Matrix(currentShader);
                 cubePileSuzanneModel.Draw(currentShader);
             }
@@ -457,7 +463,7 @@ int main() {
         }
 
         // Blending scene
-        if (true) {
+        if (false) {
             container_texture.bind(GL_TEXTURE0);
             container_specular_texture.bind(GL_TEXTURE1);
             currentShader.use();
