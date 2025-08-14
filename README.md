@@ -55,6 +55,12 @@ cmake --build .
 
 ## Dev Log
 
+## 29. Framebuffers and fullscreen Effects
+
+Here is a gif of some screenspace image effects.
+
+![effects](demos/screenspace_effects.gif)
+
 ### 28. Enable MSAA
 
 Added MSAA support.
@@ -64,8 +70,6 @@ Added MSAA support.
 ### 27. Depth Sorting
 
 Sorted the windows by distance from the camera to make sure they are drawn in the correct order. but still doesn't work perfectly.
-
-**4MB GIF**
 
 ![depth_sorting](demos/GHDgl_depth_sorting.gif)
 

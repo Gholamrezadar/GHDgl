@@ -66,7 +66,7 @@ int main() {
     if (flag == -1)
         return flag;
 
-    ///////////////////////////// Scene Setup /////////////////////////////
+    ///////////////////////////// Scene Setup //////////////////////////////
     // X: Horizontal, Y: Vertical, Z: Depth
 
     // Model matrix
@@ -76,13 +76,12 @@ int main() {
     Camera camera(SCR_WIDTH, SCR_HEIGHT, glm::vec3(0.0f, 0.0f, 0.0f), 45.0f, 0.1f, 100.0f);
     camera.Position += glm::vec3(0.64f, 0.40f, 1.58f);
     camera.Orientation = glm::rotate(camera.Orientation, glm::radians(32.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    camera.Orientation = glm::rotate(camera.Orientation, glm::radians(-5.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
     // Box Shader
     Shader currentShader("Shaders/texturedPhongShader.vert", "Shaders/texturedPhongShader.frag");
-    // Shader currentShader("Shaders/depthShader.vert", "Shaders/depthShader.frag");
     currentShader.use();
     currentShader.uniform_3f("color", 0.0f, 1.0f, 0.0f);
-    // currentShader.uniform_1f("texture1", 0);
     currentShader.uniform_mat4("model", glm::value_ptr(model));
     currentShader.uniform_3f("viewPos", camera.Position.x, camera.Position.y, camera.Position.z);
 
@@ -92,6 +91,11 @@ int main() {
     glassShader.uniform_mat4("model", glm::value_ptr(model));
     glassShader.uniform_3f("viewPos", camera.Position.x, camera.Position.y, camera.Position.z);
     glassShader.uniform_int("texture1", 0);
+
+    Shader fullscreenShader("Shaders/fullscreenShader.vert", "Shaders/fullscreenShader.frag");
+    fullscreenShader.use();
+    fullscreenShader.uniform_int("color", 0); // fullscreen color texture from fbo
+    fullscreenShader.uniform_int("depth", 1); // fullscreen depth texture from fbo 
 
     // Light settings
     // blue light
@@ -209,6 +213,32 @@ int main() {
     VBO1.unbind();
     VAO1.unbind();
 
+    // fullscreen quad 
+    float quadVertices[] = {  
+    // positions   // texCoords
+    -1.0f,  1.0f,  0.0f, 1.0f,
+    -1.0f, -1.0f,  0.0f, 0.0f,
+     1.0f, -1.0f,  1.0f, 0.0f,
+
+    -1.0f,  1.0f,  0.0f, 1.0f,
+     1.0f, -1.0f,  1.0f, 0.0f,
+     1.0f,  1.0f,  1.0f, 1.0f
+};	
+    unsigned int fullscreenQuadVAO, fullscreenQuadVBO;
+    glGenVertexArrays(1, &fullscreenQuadVAO);
+    glGenBuffers(1, &fullscreenQuadVBO);
+    glBindVertexArray(fullscreenQuadVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, fullscreenQuadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
+    // Position attribute (location = 0, vec2)
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    // TexCoord attribute (location = 1, vec2)
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
     // Texture
     const char* container2_image_address = "Images/container2.png";
     Texturee container_texture(container2_image_address, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
@@ -261,6 +291,40 @@ int main() {
     // draw in wireframe
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+     // Framebuffer shenanigans
+    unsigned int fbo;
+    unsigned int fullscreenColorTex;
+    unsigned int fullscreenDepthTex;
+    glGenFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    // --- color texture ---
+    glGenTextures(1, &fullscreenColorTex);
+    glBindTexture(GL_TEXTURE_2D, fullscreenColorTex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fullscreenColorTex, 0);
+
+    // --- depth texture (sampleable) ---
+    glGenTextures(1, &fullscreenDepthTex);
+    glBindTexture(GL_TEXTURE_2D, fullscreenDepthTex);
+    // Use either GL_DEPTH_COMPONENT24 or GL_DEPTH_COMPONENT32F
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, SCR_WIDTH, SCR_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    // Important for sampling depth as a regular float texture:
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE); // disable shadow compare
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, fullscreenDepthTex, 0); 
+
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        std::cout << "Error: Framebuffer not complete" << std::endl;
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     // Main loop
     int frameNumber = 0;
     glm::vec3 oldCameraPos = camera.Position;
@@ -285,11 +349,13 @@ int main() {
             gui.log("Camera position: " + std::to_string(camera.Position.x) + " " + std::to_string(camera.Position.y) + " " + std::to_string(camera.Position.z));
         }
 
-        /////////////////////////////////// Draw ///////////////////////////////////
+        /////////////////////////////////// Draw ////////////////////////////////////
 
         // Clear background
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+        glViewport(0,0,SCR_WIDTH, SCR_HEIGHT);
+        glEnable(GL_DEPTH_TEST);
         glClearColor(0.05f, 0.07f, 0.09f, 1.0f);
-        // gui.log("glClearColor");
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Render The Boxes and Bunny Scene
@@ -578,17 +644,42 @@ int main() {
             }
         }
 
+        // Full screen Pass
+        {
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            glViewport(0,0,SCR_WIDTH, SCR_HEIGHT);
+            glDisable(GL_DEPTH_TEST); // usually not needed for full-screen triangle
+            glClearColor(0.0f,0.0f,0.0f,1.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            // bind textures
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, fullscreenColorTex);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, fullscreenDepthTex);
+
+            // draw screen triangle
+            fullscreenShader.use();
+            fullscreenShader.uniform_int("color", 0);
+            fullscreenShader.uniform_int("depth", 1);
+
+            glBindVertexArray(fullscreenQuadVAO);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+            glBindVertexArray(0);
+
+        }
         //////////////////////////////////// UI ////////////////////////////////////
         gui.update(currentShader);
 
         // Check and call events and swap the buffers
         glfwSwapBuffers(window);
         glfwPollEvents();
-
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        
         frameNumber++;
-
+        
     }  // Main loop end
-
+    
     // Cleanup and terminate
     VAO1.remove();
     VBO1.remove();
@@ -597,9 +688,10 @@ int main() {
     container_specular_texture.remove();
     white_texture.remove();
     white_specular_texture.remove();
-
+    
     gui.cleanup();
     glfwTerminate();
+    glDeleteFramebuffers(1, &fbo);  
 
     return 0;
 }
