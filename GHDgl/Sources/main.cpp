@@ -474,7 +474,7 @@ int main() {
         }
 
         // Cubes Pile Scene
-        if (true) {
+        if (false) {
             // white texture override
             // white_texture.bind(GL_TEXTURE0);
             // white_specular_texture.bind(GL_TEXTURE1);
@@ -669,6 +669,45 @@ int main() {
             }
         }
 
+        // Suzanne only scene
+        if (true) {
+            float scaleFactor = 0.04f;
+            float zRotation = 45.0f;
+            // Suzanne
+            {
+                float tiling = 0.1f;;
+                white_texture.bind(GL_TEXTURE0);
+                white_specular_texture.bind(GL_TEXTURE1);
+                currentShader.use();
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::scale(model, glm::vec3(scaleFactor));      // it's a bit too big for our scene, so scale it down
+                model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
+                currentShader.uniform_mat4("model", glm::value_ptr(model));
+                currentShader.uniform_2f("tiling", tiling, tiling);
+                camera.Matrix(currentShader);
+                cubePileSuzanneModel.Draw(currentShader);
+            }
+
+            // Lights
+            if(false){
+                VAO1.bind();
+                VBO1.bind();
+                float lightScale = 0.03f;
+                for(int i = 0; i < NR_POINT_LIGHTS; i++) {
+                    // light matrix
+                    glm::vec3 lightPos = pointLightPositions[i];
+                    glm::vec3 lightColor = pointLightColors[i];
+                    glm::mat4 light_model = glm::mat4(1.0f);
+                    light_model = glm::translate(light_model, lightPos);
+                    light_model = glm::scale(light_model, glm::vec3(lightScale, lightScale, lightScale));
+                    lightShader.use();
+                    lightShader.uniform_3f("color", pointLightColors[i].x, pointLightColors[i].y, pointLightColors[i].z);
+                    lightShader.uniform_mat4("model", glm::value_ptr(light_model));
+                    camera.Matrix(lightShader);
+                    glDrawArrays(GL_TRIANGLES, 0, 36);
+                }
+            }
+        }
 
         // Pass 2: Resolving the MSAA fbo into a normal one
         {
