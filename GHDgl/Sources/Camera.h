@@ -44,8 +44,12 @@ public:
 
     // Updates and exports the camera matrix to the Vertex Shader
     void Matrix(Shader &shader);
+    glm::mat4 GetViewMatrix();
+    glm::mat4 GetNoTranslationViewMatrix();
+    glm::mat4 GetProjectionMatrix();
 
     void UpdatePositionInShader(Shader &shader);
+
 
     // Handles camera inputs
     void Inputs(GLFWwindow *window);

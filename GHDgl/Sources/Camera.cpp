@@ -29,6 +29,30 @@ void Camera::Matrix(Shader& shader)
 	// glUniformMatrix4fv(glGetUniformLocation(shader.ID, uniform), 1, GL_FALSE, glm::value_ptr(projection * view));
 }
 
+glm::mat4 Camera::GetViewMatrix()
+{
+	glm::mat4 view = glm::mat4(1.0f);
+	view = glm::lookAt(Position, Position + Orientation, Up);
+	return view;
+}
+
+glm::mat4 Camera::GetNoTranslationViewMatrix()
+{
+	glm::mat4 view = GetViewMatrix();
+	view[3][0] = 0.0f;
+	view[3][1] = 0.0f;
+	view[3][2] = 0.0f;
+	return view;
+	
+}
+
+glm::mat4 Camera::GetProjectionMatrix()
+{
+	glm::mat4 projection = glm::mat4(1.0f);
+	projection = glm::perspective(glm::radians(FOVdeg), (float)width / height, nearPlane, farPlane);
+	return projection;
+}
+
 void Camera::UpdatePositionInShader(Shader& shader)
 {
 	shader.uniform_3f("viewPos", Position.x, Position.y, Position.z);

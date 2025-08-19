@@ -7,6 +7,8 @@
 #include <iostream>
 #include <fstream>
 #include <imgui.h>
+#include <vector>
+#include <string>
 
 // Callback function for handling window resize
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
@@ -24,7 +26,6 @@ void ImGuiNewFrame();
 
 void ImGuiCleanup();
 
-
-
+unsigned int loadCubemap(std::vector<std::string> faces);
 
 #endif

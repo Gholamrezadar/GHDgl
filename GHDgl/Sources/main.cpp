@@ -85,6 +85,7 @@ int main() {
     currentShader.uniform_mat4("model", glm::value_ptr(model));
     currentShader.uniform_3f("viewPos", camera.Position.x, camera.Position.y, camera.Position.z);
 
+    // Glass Shader
     Shader glassShader("Shaders/glassShader.vert", "Shaders/glassShader.frag");
     glassShader.use();
     glassShader.uniform_3f("color", 0.0f, 1.0f, 0.0f);
@@ -92,6 +93,16 @@ int main() {
     glassShader.uniform_3f("viewPos", camera.Position.x, camera.Position.y, camera.Position.z);
     glassShader.uniform_int("texture1", 0);
 
+    // Skybox Reflective Shader
+    Shader skyboxReflectiveShader("Shaders/skyboxReflectiveShader.vert", "Shaders/skyboxReflectiveShader.frag");
+    skyboxReflectiveShader.use();
+    skyboxReflectiveShader.uniform_3f("cameraPos", camera.Position.x, camera.Position.y, camera.Position.z);
+    // skyboxReflectiveShader.uniform_mat4("model", glm::value_ptr(model));
+    // skyboxReflectiveShader.uniform_mat4("view", glm::value_ptr(camera.GetViewMatrix()));
+    // skyboxReflectiveShader.uniform_mat4("projection", glm::value_ptr(camera.GetProjectionMatrix()));
+    skyboxReflectiveShader.uniform_int("skybox", 0);
+
+    // fullscreen Shader
     Shader fullscreenShader("Shaders/fullscreenShader.vert", "Shaders/fullscreenShader.frag");
     fullscreenShader.use();
     fullscreenShader.uniform_int("color", 0); // fullscreen color texture from fbo
@@ -288,6 +299,83 @@ int main() {
     Model cubePileSuzanneModel("Models/cubes_pile_suzanne_smooth.obj");
     // Model ourModel("C:\\Users\\ghd\\Downloads\\backpack\\backpack.obj");
 
+
+    // Load skybox 
+    std::vector<std::string> faces;
+    faces = {
+        "Images/skybox/right.jpg",
+        "Images/skybox/left.jpg",
+        "Images/skybox/top.jpg",
+        "Images/skybox/bottom.jpg",
+        "Images/skybox/front.jpg",
+        "Images/skybox/back.jpg"
+    };
+    faces = {
+        "Images/skybox_yokohama/right.jpg",
+        "Images/skybox_yokohama/left.jpg",
+        "Images/skybox_yokohama/top.jpg",
+        "Images/skybox_yokohama/bottom.jpg",
+        "Images/skybox_yokohama/front.jpg",
+        "Images/skybox_yokohama/back.jpg"
+    };
+    unsigned int skyboxTexture = loadCubemap(faces);
+
+    // Skybox shader
+    Shader skyboxShader("Shaders/skyboxShader.vert", "Shaders/skyboxShader.frag");
+
+    // Skybox VAO, VBO
+    float skyboxVertices[] = {
+        // positions          
+        -1.0f,  1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+        -1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f
+    };
+
+    VAO skyboxVAO;
+    skyboxVAO.bind();
+    skyboxVAO.linkAttrib(0, 3, GL_FLOAT, sizeof(float), (void*)0);
+    VBO skyboxVBO(skyboxVertices, sizeof(skyboxVertices));
+    skyboxVAO.unbind();
+    skyboxVBO.unbind();
+
     // draw in wireframe
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -297,7 +385,6 @@ int main() {
     unsigned int fullscreenDepthTex;
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    // --- color texture ---
     glGenTextures(1, &fullscreenColorTex);
     glBindTexture(GL_TEXTURE_2D, fullscreenColorTex);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
@@ -306,13 +393,9 @@ int main() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fullscreenColorTex, 0);
-
-    // --- depth texture (sampleable) ---
     glGenTextures(1, &fullscreenDepthTex);
     glBindTexture(GL_TEXTURE_2D, fullscreenDepthTex);
-    // Use either GL_DEPTH_COMPONENT24 or GL_DEPTH_COMPONENT32F
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, SCR_WIDTH, SCR_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-    // Important for sampling depth as a regular float texture:
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE); // disable shadow compare
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -329,17 +412,12 @@ int main() {
     unsigned int fboMSAA;
     unsigned int colorMSAA;
     unsigned int depthMSAA;
-
     glGenFramebuffers(1, &fboMSAA);
     glBindFramebuffer(GL_FRAMEBUFFER, fboMSAA);
-
-    // --- Color (multisampled texture) ---
     glGenTextures(1, &colorMSAA);
     glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, colorMSAA);
     glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGBA8, SCR_WIDTH, SCR_HEIGHT, GL_TRUE);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, colorMSAA, 0);
-
-    // --- Depth (multisampled texture) ---
     glGenTextures(1, &depthMSAA);
     glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, depthMSAA);
     glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_DEPTH_COMPONENT24, SCR_WIDTH, SCR_HEIGHT, GL_TRUE);
@@ -382,6 +460,31 @@ int main() {
         glEnable(GL_DEPTH_TEST);
         glClearColor(0.05f, 0.07f, 0.09f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // Render the cubemap
+        if (true) {
+            // Don't affect the depth buffer
+            glDepthMask(GL_FALSE);
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
+
+                // Get the view and projection matrices from the camera
+                glm::mat4 view = camera.GetNoTranslationViewMatrix();
+                // view = camera.GetViewMatrix();
+                glm::mat4 projection = camera.GetProjectionMatrix();
+
+                skyboxShader.use();
+                skyboxShader.uniform_int("skybox", 0);
+                skyboxShader.uniform_mat4fv("view", glm::value_ptr(view));
+                // skyboxShader.uniform_mat4fv("projection", glm::value_ptr(projection));
+                skyboxShader.uniform_mat4fv("matrix", glm::value_ptr(projection * view));
+                // camera.Matrix(skyboxShader);
+
+                skyboxVAO.bind(); // TODO: Fix this debug using renderdoc
+                VAO1.bind();
+                glDrawArrays(GL_TRIANGLES, 0, 36);
+            glDepthMask(GL_TRUE);
+        }
 
         // Render The Boxes and Bunny Scene
         if (false) {
@@ -676,20 +779,20 @@ int main() {
             // Suzanne
             {
                 float tiling = 0.1f;;
-                white_texture.bind(GL_TEXTURE0);
-                white_specular_texture.bind(GL_TEXTURE1);
-                currentShader.use();
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
+                skyboxReflectiveShader.use();
                 glm::mat4 model = glm::mat4(1.0f);
                 model = glm::scale(model, glm::vec3(scaleFactor));      // it's a bit too big for our scene, so scale it down
                 model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
-                currentShader.uniform_mat4("model", glm::value_ptr(model));
-                currentShader.uniform_2f("tiling", tiling, tiling);
-                camera.Matrix(currentShader);
+                skyboxReflectiveShader.uniform_mat4("model", glm::value_ptr(model));
+                skyboxReflectiveShader.uniform_mat4fv("view", glm::value_ptr(camera.GetViewMatrix()));
+                skyboxReflectiveShader.uniform_mat4fv("projection", glm::value_ptr(camera.GetProjectionMatrix()));
                 cubePileSuzanneModel.Draw(currentShader);
             }
 
             // Lights
-            if(false){
+            if (false){
                 VAO1.bind();
                 VBO1.bind();
                 float lightScale = 0.03f;

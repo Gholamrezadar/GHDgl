@@ -55,6 +55,19 @@ cmake --build .
 
 ## Dev Log
 
+## 32. Reflective material
+
+Fully reflective material.
+
+![reflective](demos/skybox_reflective.png)
+![skybox_night](demos/skybox_reflective_night.png)
+
+## 31. Skybox
+
+Implemented cubemap skybox.
+
+![skybox](demos/skybox_demo.png)
+
 ## 30. Fullscreen Effects and MSAA
 
 This requires 3 framebuffers, a `fboMSAA`, a normal `fbo` and the `default(0)` one. We render to the MSAA FBO, then blit it to the normal one, and using that we use the image effect shader to render a fullscreen quad to the default FBO.
