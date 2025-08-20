@@ -108,6 +108,9 @@ int main() {
     explodedViewShader.uniform_3f("cameraPos", camera.Position.x, camera.Position.y, camera.Position.z);
     explodedViewShader.uniform_int("skybox", 0);
 
+    Shader normalDebugShader("Shaders/normalVizShader.vert", "Shaders/normalVizShader.frag", "Shaders/normalVizShader.geom");
+    normalDebugShader.use();
+
     // fullscreen Shader
     Shader fullscreenShader("Shaders/fullscreenShader.vert", "Shaders/fullscreenShader.frag");
     fullscreenShader.use();
@@ -790,15 +793,35 @@ int main() {
                 float amount = 0.06f; // strength of the explode effect
                 glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
-                explodedViewShader.use();
+                skyboxReflectiveShader.use();
                 glm::mat4 model = glm::mat4(1.0f);
                 model = glm::scale(model, glm::vec3(scaleFactor));      // it's a bit too big for our scene, so scale it down
                 model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
-                explodedViewShader.uniform_mat4("model", glm::value_ptr(model));
-                explodedViewShader.uniform_mat4fv("view", glm::value_ptr(camera.GetViewMatrix()));
-                explodedViewShader.uniform_mat4fv("projection", glm::value_ptr(camera.GetProjectionMatrix()));
-                explodedViewShader.uniform_1f("amount", amount);
+                skyboxReflectiveShader.uniform_mat4("model", glm::value_ptr(model));
+                skyboxReflectiveShader.uniform_mat4fv("view", glm::value_ptr(camera.GetViewMatrix()));
+                skyboxReflectiveShader.uniform_mat4fv("projection", glm::value_ptr(camera.GetProjectionMatrix()));
+                skyboxReflectiveShader.uniform_1f("amount", amount);
                 cubePileSuzanneModel.Draw(currentShader);
+            }
+
+            // Suzanne Normal Viz
+            if(true){
+                float normalLength = 0.003f; // length of normal lines
+                
+                normalDebugShader.use();
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::scale(model, glm::vec3(scaleFactor));      // same scale as main render
+                model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
+                
+                normalDebugShader.uniform_mat4("model", glm::value_ptr(model));
+                normalDebugShader.uniform_mat4fv("view", glm::value_ptr(camera.GetViewMatrix()));
+                normalDebugShader.uniform_mat4fv("projection", glm::value_ptr(camera.GetProjectionMatrix()));
+                normalDebugShader.uniform_1f("normalLength", normalLength);
+                
+                // Optional: make lines thicker for better visibility
+                glLineWidth(1.0f);
+                
+                cubePileSuzanneModel.Draw(normalDebugShader);
             }
 
             // Lights

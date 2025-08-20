@@ -55,6 +55,10 @@ cmake --build .
 
 ## Dev Log
 
+## 34. Geometry Shader (Normal Viz)
+
+![normal_viz](demos/geometry_shader_normal.png)
+
 ## 33. Geometry Shader (Exploded View)
 
 ![exploded_view](demos/geometry_shader_exploded_view_refl.png)
