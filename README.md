@@ -55,6 +55,16 @@ cmake --build .
 
 ## Dev Log
 
+## 33. Geometry Shader (Exploded View)
+
+![exploded_view](demos/geometry_shader_exploded_view_refl.png)
+
+![exploded_view](demos/geometry_shader_exploded_view.png)
+
+Initially had a bug where the normals were not being passed to the fragment shader.
+
+![exploded_view_bug](demos/geometry_shader_bug.png)
+
 ## 32. Reflective material
 
 Fully reflective material.

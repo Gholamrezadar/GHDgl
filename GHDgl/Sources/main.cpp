@@ -102,6 +102,12 @@ int main() {
     // skyboxReflectiveShader.uniform_mat4("projection", glm::value_ptr(camera.GetProjectionMatrix()));
     skyboxReflectiveShader.uniform_int("skybox", 0);
 
+    // exploded view shader
+    Shader explodedViewShader("Shaders/explodedShader.vert", "Shaders/explodedShader.frag", "Shaders/explodedShader.geom");
+    explodedViewShader.use();
+    explodedViewShader.uniform_3f("cameraPos", camera.Position.x, camera.Position.y, camera.Position.z);
+    explodedViewShader.uniform_int("skybox", 0);
+
     // fullscreen Shader
     Shader fullscreenShader("Shaders/fullscreenShader.vert", "Shaders/fullscreenShader.frag");
     fullscreenShader.use();
@@ -776,18 +782,22 @@ int main() {
         if (true) {
             float scaleFactor = 0.04f;
             float zRotation = 45.0f;
+            glEnable(GL_POLYGON_OFFSET_FILL);
+            glPolygonOffset(1.0f, 1.0f);
             // Suzanne
             {
-                float tiling = 0.1f;;
+                float tiling = 0.1f;
+                float amount = 0.06f; // strength of the explode effect
                 glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
-                skyboxReflectiveShader.use();
+                explodedViewShader.use();
                 glm::mat4 model = glm::mat4(1.0f);
                 model = glm::scale(model, glm::vec3(scaleFactor));      // it's a bit too big for our scene, so scale it down
                 model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
-                skyboxReflectiveShader.uniform_mat4("model", glm::value_ptr(model));
-                skyboxReflectiveShader.uniform_mat4fv("view", glm::value_ptr(camera.GetViewMatrix()));
-                skyboxReflectiveShader.uniform_mat4fv("projection", glm::value_ptr(camera.GetProjectionMatrix()));
+                explodedViewShader.uniform_mat4("model", glm::value_ptr(model));
+                explodedViewShader.uniform_mat4fv("view", glm::value_ptr(camera.GetViewMatrix()));
+                explodedViewShader.uniform_mat4fv("projection", glm::value_ptr(camera.GetProjectionMatrix()));
+                explodedViewShader.uniform_1f("amount", amount);
                 cubePileSuzanneModel.Draw(currentShader);
             }
 
