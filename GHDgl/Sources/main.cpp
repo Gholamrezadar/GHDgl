@@ -28,6 +28,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "utils.h"
+
 const int SCR_WIDTH = 1280;
 const int SCR_HEIGHT = 720;
 
@@ -78,6 +79,7 @@ int main() {
     camera.Orientation = glm::rotate(camera.Orientation, glm::radians(32.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     camera.Orientation = glm::rotate(camera.Orientation, glm::radians(-5.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
+    #pragma region Shaders
     // Box Shader
     Shader currentShader("Shaders/texturedPhongShader.vert", "Shaders/texturedPhongShader.frag");
     currentShader.use();
@@ -166,8 +168,9 @@ int main() {
     // light Shader (basic white color shader)
     Shader lightShader("Shaders/flatShader.vert", "Shaders/flatShader.frag");
     // Shader lightShader("Shaders/depthShader.vert", "Shaders/depthShader.frag");
+    #pragma endregion
 
-
+    #pragma region Mesh data
     float cube[] = {
     // positions        // normals          // texcoords // colors
     // Front face
@@ -232,7 +235,9 @@ int main() {
     // Unbind stuff
     VBO1.unbind();
     VAO1.unbind();
+    #pragma endregion
 
+    #pragma region Fullscreen quad
     // fullscreen quad 
     float quadVertices[] = {  
     // positions   // texCoords
@@ -258,7 +263,9 @@ int main() {
     glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+    #pragma endregion
 
+    #pragma region Textures
     // Texture
     const char* container2_image_address = "Images/container2.png";
     Texturee container_texture(container2_image_address, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
@@ -286,6 +293,7 @@ int main() {
 
     const char* window_image_address = "Images/blending_transparent_window.png";
     Texturee window_texture(window_image_address, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+    #pragma endregion
 
     MyGUI3 gui;
 
@@ -293,22 +301,19 @@ int main() {
     // stbi_set_flip_vertically_on_load(true);
 
     // configure global opengl state
-    // -----------------------------
     glEnable(GL_DEPTH_TEST);
-    // glDepthFunc(GL_ALWAYS);
     // glDisable(GL_DEPTH_TEST);
+    // glDepthFunc(GL_ALWAYS);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  
 
     // load models
-    // -----------
     Model ourModel("Models/suzanne.obj");
     Model cubePileModel("Models/cubes_pile.obj");
     Model cubePilePlaneModel("Models/cubes_pile_plane.obj");
     Model cubePileSuzanneModel("Models/cubes_pile_suzanne_smooth.obj");
-    // Model ourModel("C:\\Users\\ghd\\Downloads\\backpack\\backpack.obj");
 
-
+    #pragma region Skybox
     // Load skybox 
     std::vector<std::string> faces;
     faces = {
@@ -387,7 +392,9 @@ int main() {
 
     // draw in wireframe
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    #pragma endregion
 
+    #pragma region Framebuffer shenanigans
     // Framebuffer shenanigans
     unsigned int fbo;
     unsigned int fullscreenColorTex;
@@ -436,6 +443,7 @@ int main() {
         std::cout << "Error: MSAA Framebuffer not complete" << std::endl;
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    #pragma endregion
 
     // Main loop
     int frameNumber = 0;
@@ -443,8 +451,7 @@ int main() {
     glm::vec3 oldCameraOrient = camera.Orientation;
     while (!glfwWindowShouldClose(window)) {
         /////////////////////////////////// Input ///////////////////////////////////
-        // per-frame time logic
-        // --------------------
+
         float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
@@ -461,7 +468,7 @@ int main() {
             gui.log("Camera position: " + std::to_string(camera.Position.x) + " " + std::to_string(camera.Position.y) + " " + std::to_string(camera.Position.z));
         }
 
-        /////////////////////////////////// Draw ////////////////////////////////////
+        /////////////////////////////////// Draw ///////////////////////////////////
 
         // Pass 1: rendering with MSAA
         glBindFramebuffer(GL_FRAMEBUFFER, fboMSAA);
@@ -846,7 +853,7 @@ int main() {
         }
 
         // Pass 2: Resolving the MSAA fbo into a normal one
-        {
+        if (true) {
             glBindFramebuffer(GL_READ_FRAMEBUFFER, fboMSAA);
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
             glBlitFramebuffer(0, 0, SCR_WIDTH, SCR_HEIGHT,
@@ -857,7 +864,7 @@ int main() {
         }
 
         // Pass 3: Post Processing
-        {
+        if (true) { 
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             glViewport(0,0,SCR_WIDTH, SCR_HEIGHT);
             glDisable(GL_DEPTH_TEST); // usually not needed for full-screen triangle
@@ -880,7 +887,9 @@ int main() {
             glBindVertexArray(0);
 
         }
+
         //////////////////////////////////// UI ////////////////////////////////////
+
         gui.update(currentShader);
 
         // Check and call events and swap the buffers
