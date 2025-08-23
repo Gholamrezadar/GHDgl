@@ -87,6 +87,13 @@ int main() {
     currentShader.uniform_mat4("model", glm::value_ptr(model));
     currentShader.uniform_3f("viewPos", camera.Position.x, camera.Position.y, camera.Position.z);
 
+    // Instanced Box Shader
+    Shader instancedShader("Shaders/instancedShader.vert", "Shaders/instancedShader.frag");
+    instancedShader.use();
+    instancedShader.uniform_3f("color", 0.0f, 1.0f, 0.0f);
+    instancedShader.uniform_mat4("model", glm::value_ptr(model));
+    instancedShader.uniform_3f("viewPos", camera.Position.x, camera.Position.y, camera.Position.z);
+
     // Glass Shader
     Shader glassShader("Shaders/glassShader.vert", "Shaders/glassShader.frag");
     glassShader.use();
@@ -120,6 +127,8 @@ int main() {
     fullscreenShader.uniform_int("depth", 1); // fullscreen depth texture from fbo 
 
     // Light settings
+    float ambient = 0.35f;
+    // Current Shader
     // blue light
     currentShader.uniform_3f("pointLights[0].position", pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
     currentShader.uniform_1f("pointLights[0].constant", 1.0f);
@@ -143,7 +152,6 @@ int main() {
     currentShader.uniform_1f("pointLights[2].constant", 1.3f);
     currentShader.uniform_1f("pointLights[2].linear", 0.3f);
     currentShader.uniform_1f("pointLights[2].quadratic", 0.44f);
-    float ambient = 0.35f;
     currentShader.uniform_3f("pointLights[2].ambient", ambient, ambient, ambient);
     currentShader.uniform_3f("pointLights[2].diffuse", pointLightColors[2].x, pointLightColors[2].y, pointLightColors[2].z);
     currentShader.uniform_3f("pointLights[2].specular", pointLightColors[2].x, pointLightColors[2].y, pointLightColors[2].z);
@@ -163,7 +171,53 @@ int main() {
     currentShader.uniform_int("material.specular", 1);
     currentShader.uniform_1f("material.shininess", 64.0f);
 
+
+    // Instanced Box Shader
+    instancedShader.use();
+    // blue light
+    instancedShader.uniform_3f("pointLights[0].position", pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
+    instancedShader.uniform_1f("pointLights[0].constant", 1.0f);
+    instancedShader.uniform_1f("pointLights[0].linear", 0.3f);
+    instancedShader.uniform_1f("pointLights[0].quadratic", 0.44f);
+    instancedShader.uniform_3f("pointLights[0].ambient", 0.0f, 0.0f, 0.0f);
+    instancedShader.uniform_3f("pointLights[0].diffuse", pointLightColors[0].x, pointLightColors[0].y, pointLightColors[0].z);
+    instancedShader.uniform_3f("pointLights[0].specular", pointLightColors[0].x, pointLightColors[0].y, pointLightColors[0].z);
+
+    // red light
+    instancedShader.uniform_3f("pointLights[1].position", pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);
+    instancedShader.uniform_1f("pointLights[1].constant", 1.0f);
+    instancedShader.uniform_1f("pointLights[1].linear", 0.3f);
+    instancedShader.uniform_1f("pointLights[1].quadratic", 0.44f);
+    instancedShader.uniform_3f("pointLights[1].ambient", 0.0f, 0.0f, 0.0f);  // only the first light has ambient
+    instancedShader.uniform_3f("pointLights[1].diffuse", pointLightColors[1].x, pointLightColors[1].y, pointLightColors[1].z);
+    instancedShader.uniform_3f("pointLights[1].specular", pointLightColors[1].x, pointLightColors[1].y, pointLightColors[1].z);
+
+    // white light also has ambient
+    instancedShader.uniform_3f("pointLights[2].position", pointLightPositions[2].x, pointLightPositions[2].y, pointLightPositions[2].z);
+    instancedShader.uniform_1f("pointLights[2].constant", 1.3f);
+    instancedShader.uniform_1f("pointLights[2].linear", 0.3f);
+    instancedShader.uniform_1f("pointLights[2].quadratic", 0.44f);
+    instancedShader.uniform_3f("pointLights[2].ambient", ambient, ambient, ambient);
+    instancedShader.uniform_3f("pointLights[2].diffuse", pointLightColors[2].x, pointLightColors[2].y, pointLightColors[2].z);
+    instancedShader.uniform_3f("pointLights[2].specular", pointLightColors[2].x, pointLightColors[2].y, pointLightColors[2].z);
+
+    // green light
+    instancedShader.uniform_3f("pointLights[3].position", pointLightPositions[3].x, pointLightPositions[3].y, pointLightPositions[3].z);
+    instancedShader.uniform_1f("pointLights[3].constant", 1.0f);
+    instancedShader.uniform_1f("pointLights[3].linear", 0.3f);
+    instancedShader.uniform_1f("pointLights[3].quadratic", 0.44f);
+    instancedShader.uniform_3f("pointLights[3].ambient", 0.0f, 0.0f, 0.0f);  // only the first light has ambient
+    instancedShader.uniform_3f("pointLights[3].diffuse", pointLightColors[3].x, pointLightColors[3].y, pointLightColors[3].z);
+    instancedShader.uniform_3f("pointLights[3].specular", pointLightColors[3].x, pointLightColors[3].y, pointLightColors[3].z);
+
+    // Material settings
+    instancedShader.uniform_3f("material.ambient", ambient, ambient, ambient);
+    instancedShader.uniform_int("material.diffuse", 0);  // set to texture unit 0
+    instancedShader.uniform_int("material.specular", 1);
+    instancedShader.uniform_1f("material.shininess", 64.0f);
+
     camera.Matrix(currentShader);  // this is what moves your object
+    camera.Matrix(instancedShader);
 
     // light Shader (basic white color shader)
     Shader lightShader("Shaders/flatShader.vert", "Shaders/flatShader.frag");
@@ -235,6 +289,8 @@ int main() {
     // Unbind stuff
     VBO1.unbind();
     VAO1.unbind();
+
+
     #pragma endregion
 
     #pragma region Fullscreen quad
@@ -445,6 +501,27 @@ int main() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     #pragma endregion
 
+
+    std::vector<glm::vec3> instancePositions = {
+            };
+
+    for(int i=0; i<100; i++) {
+        for(int j=0; j<10; j++) {
+            for(int k=0; k<100; k++) {
+                instancePositions.push_back(glm::vec3(i*1.0f, j*1.0f, k*1.0f));
+            }
+        }
+    }
+
+    // Connect instance VBO to model VAO
+    // 0. pos, 1. color, 2. tex coords, 3. normal,  
+    // 4. instance position
+    GLuint instanceVBO;
+    glGenBuffers(1, &instanceVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO); // Make sure this is bound
+    glBufferData(GL_ARRAY_BUFFER, instancePositions.size() * sizeof(glm::vec3), instancePositions.data(), GL_STATIC_DRAW);
+
+
     // Main loop
     int frameNumber = 0;
     glm::vec3 oldCameraPos = camera.Position;
@@ -478,7 +555,7 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Render the cubemap
-        if (true) {
+        if (false) {
             // Don't affect the depth buffer
             glDepthMask(GL_FALSE);
                 glActiveTexture(GL_TEXTURE0);
@@ -789,7 +866,7 @@ int main() {
         }
 
         // Suzanne only scene
-        if (true) {
+        if (false) {
             float scaleFactor = 0.04f;
             float zRotation = 45.0f;
             glEnable(GL_POLYGON_OFFSET_FILL);
@@ -849,6 +926,63 @@ int main() {
                     camera.Matrix(lightShader);
                     glDrawArrays(GL_TRIANGLES, 0, 36);
                 }
+            }
+        }
+
+        // Instancing scene 
+        if (true) {
+
+            glBindBuffer(GL_ARRAY_BUFFER, instanceVBO); // Make sure this is bound
+            // bind to VAO
+            VAO1.bind();
+            glEnableVertexAttribArray(4); // use location 4 for instance offset
+            glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+
+            // tell OpenGL this(4th attrib) advances once per instance
+            glVertexAttribDivisor(4, 1);
+            VAO1.unbind();
+
+            // Set the textures
+            container_texture.bind(GL_TEXTURE0);
+            container_specular_texture.bind(GL_TEXTURE1);
+
+            // Draw the cubes
+            VAO1.bind();
+            instancedShader.use();
+            instancedShader.uniform_2f("tiling", 1.0f, 1.0f);
+            instancedShader.uniform_int("material.diffuse", 0);
+            instancedShader.uniform_int("material.specular", 1);
+            // instancedShader.uniform_3f("viewPos", camera.Position.x, camera.Position.y, camera.Position.z);
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::scale(model, glm::vec3(0.01f));
+            model = glm::translate(model, glm::vec3(-4.0f, -8.0f, -4.0f));
+            instancedShader.uniform_mat4("model", glm::value_ptr(model));
+            camera.Matrix(instancedShader);
+            camera.UpdatePositionInShader(instancedShader);
+            glDrawArraysInstanced(GL_TRIANGLES, 0, 36, instancePositions.size());
+        }
+
+        // Naive Instancing scene
+        if (false) {
+            // Set the textures
+            container_texture.bind(GL_TEXTURE0);
+            container_specular_texture.bind(GL_TEXTURE1);
+
+            // Draw the cubes one by one
+            VAO1.bind();
+            currentShader.use();
+            currentShader.uniform_2f("tiling", 1.0f, 1.0f);
+            currentShader.uniform_int("material.diffuse", 0);
+            currentShader.uniform_int("material.specular", 1);
+            camera.Matrix(currentShader);
+            camera.UpdatePositionInShader(currentShader);
+            for(auto& pos : instancePositions) {
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::scale(model, glm::vec3(0.01f));
+                model = glm::translate(model, glm::vec3(-4.0f, -8.0f, -4.0f));
+                model = glm::translate(model, pos);
+                currentShader.uniform_mat4("model", glm::value_ptr(model));
+                glDrawArrays(GL_TRIANGLES, 0, 36);
             }
         }
 
