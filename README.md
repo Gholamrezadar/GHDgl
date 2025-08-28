@@ -73,7 +73,7 @@ Naive CPU "instancing" for comparison:
 
 Here are the renderdoc events for naive instancing (Soooo many drawcalls slows down the app, also note the lower GPU usage because we are CPU bound):
 
-![gpu_instancing_rendercalls](demos/gpu_instancing_rendercalls.png)
+![naive_instancing_rendercalls](demos/naive_instancing_rendercalls.png)
 
 ## 34. Geometry Shader (Normal Viz)
 
