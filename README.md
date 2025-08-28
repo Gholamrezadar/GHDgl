@@ -55,6 +55,26 @@ cmake --build .
 
 ## Dev Log
 
+## 35. GPU Instancing
+
+Implemented GPU instancing using `glDrawArraysInstanced`.
+
+![instancing](demos/gpu_instancing.png)
+
+Here are the renderdoc events:
+
+![gpu_instancing_rendercalls](demos/gpu_instancing_rendercalls.png)
+
+---
+
+Naive CPU "instancing" for comparison:
+
+![naive_instancing](demos/naive_instancing.png)
+
+Here are the renderdoc events for naive instancing (Soooo many drawcalls slows down the app, also note the lower GPU usage because we are CPU bound):
+
+![gpu_instancing_rendercalls](demos/gpu_instancing_rendercalls.png)
+
 ## 34. Geometry Shader (Normal Viz)
 
 ![normal_viz](demos/geometry_shader_normal.png)
