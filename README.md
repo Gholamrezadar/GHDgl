@@ -55,6 +55,16 @@ cmake --build .
 
 ## Dev Log
 
+## 36. Normal Map
+
+Implemented normal map shader.
+
+![normal_map](demos/normal_map_result.png)
+
+Without normal map:
+
+![normal_map](demos/before_normal_map_result.png)
+
 ## 35. GPU Instancing
 
 Implemented GPU instancing using `glDrawArraysInstanced`.

@@ -87,6 +87,13 @@ int main() {
     currentShader.uniform_mat4("model", glm::value_ptr(model));
     currentShader.uniform_3f("viewPos", camera.Position.x, camera.Position.y, camera.Position.z);
 
+    // Normal Map Shader
+    Shader normalMapShader("Shaders/normalMapShader.vert", "Shaders/normalMapShader.frag");
+    normalMapShader.use();
+    normalMapShader.uniform_3f("color", 0.0f, 1.0f, 0.0f);
+    normalMapShader.uniform_mat4("model", glm::value_ptr(model));
+    normalMapShader.uniform_3f("viewPos", camera.Position.x, camera.Position.y, camera.Position.z);
+
     // Instanced Box Shader
     Shader instancedShader("Shaders/instancedShader.vert", "Shaders/instancedShader.frag");
     instancedShader.use();
@@ -171,6 +178,50 @@ int main() {
     currentShader.uniform_int("material.specular", 1);
     currentShader.uniform_1f("material.shininess", 64.0f);
 
+    // normalMapShader Shader
+    // blue light
+    normalMapShader.uniform_3f("pointLights[0].position", pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
+    normalMapShader.uniform_1f("pointLights[0].constant", 1.0f);
+    normalMapShader.uniform_1f("pointLights[0].linear", 0.3f);
+    normalMapShader.uniform_1f("pointLights[0].quadratic", 0.44f);
+    normalMapShader.uniform_3f("pointLights[0].ambient", 0.0f, 0.0f, 0.0f);
+    normalMapShader.uniform_3f("pointLights[0].diffuse", pointLightColors[0].x, pointLightColors[0].y, pointLightColors[0].z);
+    normalMapShader.uniform_3f("pointLights[0].specular", pointLightColors[0].x, pointLightColors[0].y, pointLightColors[0].z);
+
+    // red light
+    normalMapShader.uniform_3f("pointLights[1].position", pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);
+    normalMapShader.uniform_1f("pointLights[1].constant", 1.0f);
+    normalMapShader.uniform_1f("pointLights[1].linear", 0.3f);
+    normalMapShader.uniform_1f("pointLights[1].quadratic", 0.44f);
+    normalMapShader.uniform_3f("pointLights[1].ambient", 0.0f, 0.0f, 0.0f);  // only the first light has ambient
+    normalMapShader.uniform_3f("pointLights[1].diffuse", pointLightColors[1].x, pointLightColors[1].y, pointLightColors[1].z);
+    normalMapShader.uniform_3f("pointLights[1].specular", pointLightColors[1].x, pointLightColors[1].y, pointLightColors[1].z);
+
+    // white light also has ambient
+    normalMapShader.uniform_3f("pointLights[2].position", pointLightPositions[2].x, pointLightPositions[2].y, pointLightPositions[2].z);
+    normalMapShader.uniform_1f("pointLights[2].constant", 1.3f);
+    normalMapShader.uniform_1f("pointLights[2].linear", 0.3f);
+    normalMapShader.uniform_1f("pointLights[2].quadratic", 0.44f);
+    normalMapShader.uniform_3f("pointLights[2].ambient", ambient, ambient, ambient);
+    normalMapShader.uniform_3f("pointLights[2].diffuse", pointLightColors[2].x, pointLightColors[2].y, pointLightColors[2].z);
+    normalMapShader.uniform_3f("pointLights[2].specular", pointLightColors[2].x, pointLightColors[2].y, pointLightColors[2].z);
+
+    // green light
+    normalMapShader.uniform_3f("pointLights[3].position", pointLightPositions[3].x, pointLightPositions[3].y, pointLightPositions[3].z);
+    normalMapShader.uniform_1f("pointLights[3].constant", 1.0f);
+    normalMapShader.uniform_1f("pointLights[3].linear", 0.3f);
+    normalMapShader.uniform_1f("pointLights[3].quadratic", 0.44f);
+    normalMapShader.uniform_3f("pointLights[3].ambient", 0.0f, 0.0f, 0.0f);  // only the first light has ambient
+    normalMapShader.uniform_3f("pointLights[3].diffuse", pointLightColors[3].x, pointLightColors[3].y, pointLightColors[3].z);
+    normalMapShader.uniform_3f("pointLights[3].specular", pointLightColors[3].x, pointLightColors[3].y, pointLightColors[3].z);
+
+    // Material settings
+    normalMapShader.uniform_3f("material.ambient", ambient, ambient, ambient);
+    normalMapShader.uniform_int("material.diffuse", 0);  // set to texture unit 0
+    normalMapShader.uniform_int("material.specular", 1);
+    normalMapShader.uniform_int("material.normal", 2); // GL_TEXTURE2 for normal map
+    normalMapShader.uniform_1f("material.shininess", 64.0f);
+
 
     // Instanced Box Shader
     instancedShader.use();
@@ -217,6 +268,7 @@ int main() {
     instancedShader.uniform_1f("material.shininess", 64.0f);
 
     camera.Matrix(currentShader);  // this is what moves your object
+    camera.Matrix(normalMapShader);  // this is what moves your object
     camera.Matrix(instancedShader);
 
     // light Shader (basic white color shader)
@@ -346,6 +398,9 @@ int main() {
 
     const char* floor_spec_image_address = "Images/rubber_tiles_spec_2k.jpg";
     Texturee floor_spec_texture(floor_spec_image_address, GL_TEXTURE_2D, GL_TEXTURE1, GL_RGB, GL_UNSIGNED_BYTE);
+
+    const char* floor_normal_image_address = "Images/rubber_tiles_nor_gl_2k.jpg";
+    Texturee floor_normal_texture(floor_normal_image_address, GL_TEXTURE_2D, GL_TEXTURE2, GL_RGB, GL_UNSIGNED_BYTE);
 
     const char* window_image_address = "Images/blending_transparent_window.png";
     Texturee window_texture(window_image_address, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
@@ -930,7 +985,7 @@ int main() {
         }
 
         // Instancing scene 
-        if (true) {
+        if (false) {
 
             glBindBuffer(GL_ARRAY_BUFFER, instanceVBO); // Make sure this is bound
             // bind to VAO
@@ -983,6 +1038,56 @@ int main() {
                 model = glm::translate(model, pos);
                 currentShader.uniform_mat4("model", glm::value_ptr(model));
                 glDrawArrays(GL_TRIANGLES, 0, 36);
+            }
+        }
+
+        // Normal Map scene
+        if (true) {
+            container_texture.bind(GL_TEXTURE0);
+            container_specular_texture.bind(GL_TEXTURE1);
+            floor_normal_texture.bind(GL_TEXTURE2);
+            currentShader.use();
+
+            float scaleFactor = -0.02f;
+            float zRotation = 45.0f;
+            
+            // Plane
+            {
+                float tiling = 0.301001f;
+                floor_texture.bind(GL_TEXTURE0);
+                white_texture.bind(GL_TEXTURE0);
+                floor_spec_texture.bind(GL_TEXTURE1);
+                floor_normal_texture.bind(GL_TEXTURE2);
+                // white_specular_texture.bind(GL_TEXTURE1);
+                normalMapShader.use();
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::scale(model, glm::vec3(scaleFactor));      // it's a bit too big for our scene, so scale it down
+                model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
+                model = glm::translate(model, glm::vec3(0.0f, -24.0f, 0.0f));
+                normalMapShader.uniform_mat4("model", glm::value_ptr(model));
+                normalMapShader.uniform_2f("tiling", tiling, tiling);
+                camera.Matrix(normalMapShader);
+                cubePilePlaneModel.Draw(normalMapShader);
+            }
+
+            // Lights
+            {
+                VAO1.bind();
+                VBO1.bind();
+                float lightScale = 0.02f;
+                for(int i = 0; i < NR_POINT_LIGHTS; i++) {
+                    // light matrix
+                    glm::vec3 lightPos = pointLightPositions[i];
+                    glm::vec3 lightColor = pointLightColors[i];
+                    glm::mat4 light_model = glm::mat4(1.0f);
+                    light_model = glm::translate(light_model, lightPos);
+                    light_model = glm::scale(light_model, glm::vec3(lightScale, lightScale, lightScale));
+                    lightShader.use();
+                    lightShader.uniform_3f("color", pointLightColors[i].x, pointLightColors[i].y, pointLightColors[i].z);
+                    lightShader.uniform_mat4("model", glm::value_ptr(light_model));
+                    camera.Matrix(lightShader);
+                    glDrawArrays(GL_TRIANGLES, 0, 36);
+                }
             }
         }
 
