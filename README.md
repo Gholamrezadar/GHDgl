@@ -1,18 +1,15 @@
 # GHDgl
 
-My personal OpenGL sandbox project.
-I plan to implement various OpenGL features and techniques in this project.
+Learning OpenGL from learnopengl.com (mostly).
 
 ![demo](demos/effects_rgb_split.png)
-Currently tested on Windows 10 (Visual Studio 2022) and Ubuntu 22.04 (GCC)
+Currently tested on Windows 10 (Visual Studio 2022) and Ubuntu 22.04 (GCC 11.4.0)
 
 ## Dependencies
 
 - CMake 3.31 or higher
 - You need to build assimp.dll and assimp.lib by your own and place them inside `vendor/assimp/lib`
 . also rename them in `CMakeLists.txt` file if needed.
-
-## Stack
 
 - CMake
 - OpenGL
@@ -23,6 +20,7 @@ Currently tested on Windows 10 (Visual Studio 2022) and Ubuntu 22.04 (GCC)
 - imgui (Docking)
 - assimp
 
+<!-- ## TODO
 ## Features
 
 - FPS Camera Movement
@@ -30,8 +28,6 @@ Currently tested on Windows 10 (Visual Studio 2022) and Ubuntu 22.04 (GCC)
 - Multiple Point Lights
 - Loading Models
 - Textures
-
-<!-- ## TODO
 
 - [ ] Fresnel Shader
 - [ ] Outline Shader
