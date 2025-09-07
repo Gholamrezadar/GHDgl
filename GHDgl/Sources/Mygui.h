@@ -25,6 +25,8 @@ public:
     glm::vec3 triangleColor = glm::vec3(1.0f, 0.0f, 0.0f);
     float angle = 55.0f;
     std::vector<std::string> logs;
+    unsigned int shadowMap;
+    glm::vec3* DirLightPos = nullptr; 
 
     MyGUI3();
     void calcFPS(double updateInterval);
@@ -38,6 +40,7 @@ private:
     void colorPickerUI(Shader & flatTextureShader);
     void fpsUI();
     void logUI();
+    void shadowMapUI();
 };
 
 #endif // !MY_GUI_H
