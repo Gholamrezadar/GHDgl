@@ -8,9 +8,11 @@ out vec3 vertexColor;
 out vec2 TexCoords;
 out vec3 Normal;
 out vec3 FragPos;
+out vec4 FragPosLightSpace;
 
 uniform mat4 model;
 uniform mat4 matrix; // Combines projection * view from the camera
+uniform mat4 lightSpaceMatrix;
 
 void main()
 {
@@ -20,5 +22,7 @@ void main()
     vertexColor = aColor;
     TexCoords = aTexCoord;
     Normal = mat3(transpose(inverse(model))) * aNormal;
+    FragPosLightSpace = lightSpaceMatrix * vec4(FragPos, 1.0);
+    
     //Normal = aNormal;
 }

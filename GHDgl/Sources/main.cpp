@@ -559,8 +559,8 @@ int main() {
     #pragma region Directional Shadow Map
     unsigned int shadowMapFBO;
     unsigned int shadowMap;
-    constexpr int SHADOW_MAP_WIDTH = 1024;
-    constexpr int SHADOW_MAP_HEIGHT = 1024;
+    constexpr int SHADOW_MAP_WIDTH = 1024*4;
+    constexpr int SHADOW_MAP_HEIGHT = 1024*4;
     glGenFramebuffers(1, &shadowMapFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFBO);
     glGenTextures(1, &shadowMap);
@@ -571,13 +571,16 @@ int main() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    // imgui display swizzle hack (r, 0, 0, 1) -> (r, r, r, 1)
+    GLint swizzleMask[] = {GL_RED, GL_RED, GL_RED, GL_ONE}; 
+    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowMap, 0);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cout << "Error: Shadow Map Framebuffer not complete" << std::endl;
 
     // Light matrices
-    float near_plane = 1.0f, far_plane = 7.5f;
-    glm::vec3 DirLightPos = glm::vec3(-2.0f, 4.0f, -1.0f);
+    float near_plane = 1.0f, far_plane = 8.5f;
+    glm::vec3 DirLightPos = glm::vec3(4.9f, 1.8f, 0.0f);
     glm::mat4 lightProjection = glm::ortho(-2.0f, 2.0f, -2.0f, 2.0f, near_plane, far_plane);  
     glm::mat4 lightView = glm::lookAt(DirLightPos, 
                                       glm::vec3( 0.0f, 0.0f,  0.0f), 
@@ -846,18 +849,22 @@ int main() {
         if (true) {
             // Render the shadow map
             if (true) {
+
                 glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFBO);
                 glViewport(0,0,SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT);
                 glClear(GL_DEPTH_BUFFER_BIT);
+
+
                 shadowMapShader.use();
                 // recalculate the lightSpaceMatrix
                 lightView = glm::lookAt(DirLightPos, 
                                       glm::vec3( 0.0f, 0.0f,  0.0f), 
                                       glm::vec3( 0.0f, 1.0f,  0.0f));
+
                 lightSpaceMatrix = lightProjection * lightView;
+
                 shadowMapShader.uniform_mat4("lightSpaceMatrix", glm::value_ptr(lightSpaceMatrix));
                 // Render the scene with shadowMapShader from the pov of the light
-
                 float scaleFactor = 0.04f;
                 float zRotation = 45.0f;
                 
@@ -873,13 +880,14 @@ int main() {
                 }
 
                 // Cubes Pile
-                if(false) {
+                if(true) {
                     shadowMapShader.use();
                     glm::mat4 model = glm::mat4(1.0f);
                     model = glm::scale(model, glm::vec3(scaleFactor));      // it's a bit too big for our scene, so scale it down
                     model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
                     shadowMapShader.uniform_mat4("model", glm::value_ptr(model));
                     // camera.Matrix(currentShader);
+
                     cubePileModel.Draw(shadowMapShader);
                 }
 
@@ -902,7 +910,7 @@ int main() {
             glViewport(0,0,SCR_WIDTH, SCR_HEIGHT);
             glEnable(GL_DEPTH_TEST);
             glClearColor(0.05f, 0.07f, 0.09f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);;
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             // white texture override
             white_texture.bind(GL_TEXTURE0);
@@ -910,7 +918,22 @@ int main() {
 
             container_texture.bind(GL_TEXTURE0);
             container_specular_texture.bind(GL_TEXTURE1);
+
+            // bind shadow map (as texture "2")
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, shadowMap);
+
             currentShader.use();
+
+            // recalculate the lightSpaceMatrix
+            lightView = glm::lookAt(DirLightPos, 
+                glm::vec3( 0.0f, 0.0f,  0.0f), 
+                glm::vec3( 0.0f, 1.0f,  0.0f));
+                lightSpaceMatrix = lightProjection * lightView;
+                
+            // shadow map uniforms
+            currentShader.uniform_mat4("lightSpaceMatrix", glm::value_ptr(lightSpaceMatrix));
+            currentShader.uniform_int("shadowMap", 2);
 
             float scaleFactor = 0.04f;
             float zRotation = 45.0f;
@@ -918,6 +941,7 @@ int main() {
             // Plane
             {
                 float tiling = 0.5f;
+
                 floor_texture.bind(GL_TEXTURE0);
                     // white texture override
                     white_texture.bind(GL_TEXTURE0);
@@ -933,7 +957,7 @@ int main() {
             }
 
             // Cubes Pile
-            if(false) {
+            if(true) {
                 float tiling = 1.00f;
                 veneer_texture.bind(GL_TEXTURE0);
                     // white texture override

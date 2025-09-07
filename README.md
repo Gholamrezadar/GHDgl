@@ -51,6 +51,20 @@ cmake --build .
 
 ## Dev Log
 
+## 37. Directional Shadow Map
+
+Implemented directional shadow map + PCF
+
+![directional_shadow_map](demos/shadow_map_pcf.png)
+
+On another scene with higher res shadow map:
+
+![directional_shadow_map_pile](demos/shadow_map_cube_pile.png)
+
+Failed Attempt without bias:
+
+![directional_shadow_map_failed](demos/shadow_map_first_attempt.png)
+
 ## 36. Normal Map
 
 Implemented normal map shader.
