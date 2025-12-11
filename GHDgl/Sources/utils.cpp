@@ -60,7 +60,9 @@ int initialization(GLFWwindow *&window, int width, int height, const char *title
 
     // Disable Vsync
     // To enable Vsync, set the value to 1
+    // To disable Vsync, set the value to 0
     glfwSwapInterval(1);
+    // glfwSwapInterval(0);
 
     // Initialize GLAD
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
