@@ -60,20 +60,21 @@ float ShadowCalculation(vec4 fragPosLightSpace)
     // return shadow;
 
     // PCF (Percentage-Closer Filtering)
-    // float shadow = 0.0;
-    // vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
-    // for(int x = -1; x <= 1; ++x)
-    // {
-    //     for(int y = -1; y <= 1; ++y)
-    //     {
-    //         float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
-    //         shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
-    //     }
-    // }
-    // shadow /= 9.0;
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+    int n = 3;
+    for(int x = -n; x <= n; ++x)
+    {
+        for(int y = -n; y <= n; ++y)
+        {
+            float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
+            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
+        }
+    }
+    shadow /= (2*n+1)*(2*n+1);
 
-    float shadow=0.0f;
-    shadow = currentDepth - bias > texture(shadowMap, projCoords.xy).r ? 1.0 : 0.0;
+    // float shadow=0.0f;
+    // shadow = currentDepth - bias > texture(shadowMap, projCoords.xy).r ? 1.0 : 0.0;
 
     return shadow;
 }

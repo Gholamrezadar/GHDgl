@@ -559,7 +559,7 @@ int main() {
     glBindTexture(GL_TEXTURE_2D, shadowMap);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -573,8 +573,9 @@ int main() {
 
     // Light matrices
     float near_plane = 0.10f;
-    float far_plane = 20.0f;
-    float ortho_size = 1.0f;
+    float far_plane = 10.0f;
+    float ortho_size = 1.50f;
+
     glm::vec3 DirLightPos = glm::vec3(4.9f, 1.8f, 0.0f);
     glm::mat4 lightProjection = glm::ortho(-ortho_size, ortho_size, -ortho_size, ortho_size, near_plane, far_plane);
     glm::mat4 lightView = glm::lookAt(DirLightPos,
@@ -898,6 +899,8 @@ int main() {
                 }
 
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                glCullFace(GL_BACK); // don't forget to reset original culling face
+
             }
 
             // Render the scene normally
@@ -906,6 +909,9 @@ int main() {
             glEnable(GL_DEPTH_TEST);
             glClearColor(0.05f, 0.07f, 0.09f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            // backface trick
+            glEnable(GL_FRONT);
 
             // white texture override
             white_texture.bind(GL_TEXTURE0);
