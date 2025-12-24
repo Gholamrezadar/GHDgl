@@ -22,11 +22,15 @@ public:
     int frameCount = 0;
     double fps = 0.0;
     double previousTime = 0.0;
-    glm::vec3 triangleColor = glm::vec3(1.0f, 0.0f, 0.0f);
+
     float angle = 55.0f;
-    std::vector<std::string> logs;
+
     unsigned int shadowMap;
+    float shadow_bias = 0.00001f;
     glm::vec3* DirLightPos = nullptr; 
+    std::vector<std::string> logs;
+
+    glm::vec3 triangleColor = glm::vec3(1.0f, 0.0f, 0.0f);
 
     MyGUI3();
     void calcFPS(double updateInterval);
@@ -43,4 +47,4 @@ private:
     void shadowMapUI();
 };
 
-#endif // !MY_GUI_H
+#endif

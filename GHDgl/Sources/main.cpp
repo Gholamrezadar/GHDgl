@@ -2,15 +2,13 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
-#include <assimp/Importer.hpp>
 
+#include <assimp/Importer.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
 #include <iostream>
 #include <string>
 #include <vector>
@@ -79,8 +77,9 @@ int main() {
     camera.Orientation = glm::rotate(camera.Orientation, glm::radians(32.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     camera.Orientation = glm::rotate(camera.Orientation, glm::radians(-5.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
-    #pragma region Shaders
+#pragma region Shaders
     // Box Shader
+
     Shader currentShader("Shaders/texturedPhongShader.vert", "Shaders/texturedPhongShader.frag");
     currentShader.use();
     currentShader.uniform_3f("color", 0.0f, 1.0f, 0.0f);
@@ -130,8 +129,8 @@ int main() {
     // fullscreen Shader
     Shader fullscreenShader("Shaders/fullscreenShader.vert", "Shaders/fullscreenShader.frag");
     fullscreenShader.use();
-    fullscreenShader.uniform_int("color", 0); // fullscreen color texture from fbo
-    fullscreenShader.uniform_int("depth", 1); // fullscreen depth texture from fbo 
+    fullscreenShader.uniform_int("color", 0);  // fullscreen color texture from fbo
+    fullscreenShader.uniform_int("depth", 1);  // fullscreen depth texture from fbo
 
     // Light settings
     float ambient = 0.35f;
@@ -219,9 +218,8 @@ int main() {
     normalMapShader.uniform_3f("material.ambient", ambient, ambient, ambient);
     normalMapShader.uniform_int("material.diffuse", 0);  // set to texture unit 0
     normalMapShader.uniform_int("material.specular", 1);
-    normalMapShader.uniform_int("material.normal", 2); // GL_TEXTURE2 for normal map
+    normalMapShader.uniform_int("material.normal", 2);  // GL_TEXTURE2 for normal map
     normalMapShader.uniform_1f("material.shininess", 64.0f);
-
 
     // Instanced Box Shader
     instancedShader.use();
@@ -267,66 +265,65 @@ int main() {
     instancedShader.uniform_int("material.specular", 1);
     instancedShader.uniform_1f("material.shininess", 64.0f);
 
-    camera.Matrix(currentShader);  // this is what moves your object
+    camera.Matrix(currentShader);    // this is what moves your object
     camera.Matrix(normalMapShader);  // this is what moves your object
     camera.Matrix(instancedShader);
 
     // light Shader (basic white color shader)
     Shader lightShader("Shaders/flatShader.vert", "Shaders/flatShader.frag");
-    // Shader lightShader("Shaders/depthShader.vert", "Shaders/depthShader.frag");
-    #pragma endregion
+// Shader lightShader("Shaders/depthShader.vert", "Shaders/depthShader.frag");
+#pragma endregion
 
-    #pragma region Mesh data
+#pragma region Mesh data
     float cube[] = {
-    // positions        // normals          // texcoords // colors
-    // Front face
-    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,
+        // positions        // normals          // texcoords // colors
+        // Front face
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
 
-    // Back face
-    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,
+        // Back face
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
 
-    // Left face
-    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,
+        // Left face
+        -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        -0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
 
-    // Right face
-     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,
+        // Right face
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+        0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
 
-    // Bottom face
-    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,
+        // Bottom face
+        -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
 
-    // Top face
-    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f
-};
+        // Top face
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f};
 
     // Mesh
     VAO VAO1;
@@ -342,21 +339,19 @@ int main() {
     VBO1.unbind();
     VAO1.unbind();
 
+#pragma endregion
 
-    #pragma endregion
+#pragma region Fullscreen quad
+    // fullscreen quad
+    float quadVertices[] = {
+        // positions   // texCoords
+        -1.0f, 1.0f, 0.0f, 1.0f,
+        -1.0f, -1.0f, 0.0f, 0.0f,
+        1.0f, -1.0f, 1.0f, 0.0f,
 
-    #pragma region Fullscreen quad
-    // fullscreen quad 
-    float quadVertices[] = {  
-    // positions   // texCoords
-    -1.0f,  1.0f,  0.0f, 1.0f,
-    -1.0f, -1.0f,  0.0f, 0.0f,
-     1.0f, -1.0f,  1.0f, 0.0f,
-
-    -1.0f,  1.0f,  0.0f, 1.0f,
-     1.0f, -1.0f,  1.0f, 0.0f,
-     1.0f,  1.0f,  1.0f, 1.0f
-};	
+        -1.0f, 1.0f, 0.0f, 1.0f,
+        1.0f, -1.0f, 1.0f, 0.0f,
+        1.0f, 1.0f, 1.0f, 1.0f};
     unsigned int fullscreenQuadVAO, fullscreenQuadVBO;
     glGenVertexArrays(1, &fullscreenQuadVAO);
     glGenBuffers(1, &fullscreenQuadVBO);
@@ -371,9 +366,9 @@ int main() {
     glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-    #pragma endregion
+#pragma endregion
 
-    #pragma region Textures
+#pragma region Textures
     // Texture
     const char* container2_image_address = "Images/container2.png";
     Texturee container_texture(container2_image_address, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
@@ -404,7 +399,7 @@ int main() {
 
     const char* window_image_address = "Images/blending_transparent_window.png";
     Texturee window_texture(window_image_address, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-    #pragma endregion
+#pragma endregion
 
     MyGUI3 gui;
 
@@ -416,7 +411,7 @@ int main() {
     // glDisable(GL_DEPTH_TEST);
     // glDepthFunc(GL_ALWAYS);
     glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // load models
     Model ourModel("Models/suzanne.obj");
@@ -424,8 +419,8 @@ int main() {
     Model cubePilePlaneModel("Models/cubes_pile_plane.obj");
     Model cubePileSuzanneModel("Models/cubes_pile_suzanne_smooth.obj");
 
-    #pragma region Skybox
-    // Load skybox 
+#pragma region Skybox
+    // Load skybox
     std::vector<std::string> faces;
     faces = {
         "Images/skybox/right.jpg",
@@ -433,16 +428,14 @@ int main() {
         "Images/skybox/top.jpg",
         "Images/skybox/bottom.jpg",
         "Images/skybox/front.jpg",
-        "Images/skybox/back.jpg"
-    };
+        "Images/skybox/back.jpg"};
     faces = {
         "Images/skybox_yokohama/right.jpg",
         "Images/skybox_yokohama/left.jpg",
         "Images/skybox_yokohama/top.jpg",
         "Images/skybox_yokohama/bottom.jpg",
         "Images/skybox_yokohama/front.jpg",
-        "Images/skybox_yokohama/back.jpg"
-    };
+        "Images/skybox_yokohama/back.jpg"};
     unsigned int skyboxTexture = loadCubemap(faces);
 
     // Skybox shader
@@ -450,49 +443,48 @@ int main() {
 
     // Skybox VAO, VBO
     float skyboxVertices[] = {
-        // positions          
-        -1.0f,  1.0f, -1.0f,
+        // positions
+        -1.0f, 1.0f, -1.0f,
         -1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
-         1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f,
+        1.0f, 1.0f, -1.0f,
+        -1.0f, 1.0f, -1.0f,
 
-        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, 1.0f,
         -1.0f, -1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f,  1.0f,
-        -1.0f, -1.0f,  1.0f,
+        -1.0f, 1.0f, -1.0f,
+        -1.0f, 1.0f, -1.0f,
+        -1.0f, 1.0f, 1.0f,
+        -1.0f, -1.0f, 1.0f,
 
-         1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f,
+        1.0f, -1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f,
 
-        -1.0f, -1.0f,  1.0f,
-        -1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f, -1.0f,  1.0f,
-        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, 1.0f,
+        -1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f,
+        1.0f, -1.0f, 1.0f,
+        -1.0f, -1.0f, 1.0f,
 
-        -1.0f,  1.0f, -1.0f,
-         1.0f,  1.0f, -1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-        -1.0f,  1.0f,  1.0f,
-        -1.0f,  1.0f, -1.0f,
+        -1.0f, 1.0f, -1.0f,
+        1.0f, 1.0f, -1.0f,
+        1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f,
+        -1.0f, 1.0f, 1.0f,
+        -1.0f, 1.0f, -1.0f,
 
         -1.0f, -1.0f, -1.0f,
-        -1.0f, -1.0f,  1.0f,
-         1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
-        -1.0f, -1.0f,  1.0f,
-         1.0f, -1.0f,  1.0f
-    };
+        -1.0f, -1.0f, 1.0f,
+        1.0f, -1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f, 1.0f,
+        1.0f, -1.0f, 1.0f};
 
     VAO skyboxVAO;
     skyboxVAO.bind();
@@ -501,11 +493,11 @@ int main() {
     skyboxVAO.unbind();
     skyboxVBO.unbind();
 
-    // draw in wireframe
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    #pragma endregion
+// draw in wireframe
+// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+#pragma endregion
 
-    #pragma region Framebuffer shenanigans
+#pragma region Framebuffer shenanigans
     // Framebuffer shenanigans
     unsigned int fbo;
     unsigned int fullscreenColorTex;
@@ -523,14 +515,14 @@ int main() {
     glGenTextures(1, &fullscreenDepthTex);
     glBindTexture(GL_TEXTURE_2D, fullscreenDepthTex);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, SCR_WIDTH, SCR_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE); // disable shadow compare
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);  // disable shadow compare
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, fullscreenDepthTex, 0); 
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, fullscreenDepthTex, 0);
 
-    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         std::cout << "Error: Framebuffer not complete" << std::endl;
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -554,64 +546,66 @@ int main() {
         std::cout << "Error: MSAA Framebuffer not complete" << std::endl;
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    #pragma endregion
+#pragma endregion
 
-    #pragma region Directional Shadow Map
+#pragma region Directional Shadow Map
     unsigned int shadowMapFBO;
     unsigned int shadowMap;
-    constexpr int SHADOW_MAP_WIDTH = 1024*4;
-    constexpr int SHADOW_MAP_HEIGHT = 1024*4;
+    constexpr int SHADOW_MAP_WIDTH = 1024 * 4;
+    constexpr int SHADOW_MAP_HEIGHT = 1024 * 4;
     glGenFramebuffers(1, &shadowMapFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFBO);
     glGenTextures(1, &shadowMap);
     glBindTexture(GL_TEXTURE_2D, shadowMap);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     // imgui display swizzle hack (r, 0, 0, 1) -> (r, r, r, 1)
-    GLint swizzleMask[] = {GL_RED, GL_RED, GL_RED, GL_ONE}; 
+    GLint swizzleMask[] = {GL_RED, GL_RED, GL_RED, GL_ONE};
     glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowMap, 0);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cout << "Error: Shadow Map Framebuffer not complete" << std::endl;
 
     // Light matrices
-    float near_plane = 1.0f, far_plane = 8.5f;
+    float near_plane = 0.10f;
+    float far_plane = 20.0f;
+    float ortho_size = 1.0f;
     glm::vec3 DirLightPos = glm::vec3(4.9f, 1.8f, 0.0f);
-    glm::mat4 lightProjection = glm::ortho(-2.0f, 2.0f, -2.0f, 2.0f, near_plane, far_plane);  
-    glm::mat4 lightView = glm::lookAt(DirLightPos, 
-                                      glm::vec3( 0.0f, 0.0f,  0.0f), 
-                                      glm::vec3( 0.0f, 1.0f,  0.0f));  
-    glm::mat4 lightSpaceMatrix = lightProjection * lightView; 
+    glm::mat4 lightProjection = glm::ortho(-ortho_size, ortho_size, -ortho_size, ortho_size, near_plane, far_plane);
+    glm::mat4 lightView = glm::lookAt(DirLightPos,
+                                      glm::vec3(0.0f, 0.0f, 0.0f),
+                                      glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
     Shader shadowMapShader("Shaders/shadowMap.vert", "Shaders/shadowMap.frag");
     shadowMapShader.use();
     shadowMapShader.uniform_mat4("lightSpaceMatrix", glm::value_ptr(lightSpaceMatrix));
     gui.shadowMap = shadowMap;
     gui.DirLightPos = &DirLightPos;
-    #pragma endregion
+#pragma endregion
 
     // Precalculate the instance positions
-    std::vector<glm::vec3> instancePositions = {
-            };
+    std::vector<glm::vec3> instancePositions = {};
 
-    for(int i=0; i<100; i++) {
-        for(int j=0; j<10; j++) {
-            for(int k=0; k<100; k++) {
-                instancePositions.push_back(glm::vec3(i*1.0f, j*1.0f, k*1.0f));
+    for (int i = 0; i < 100; i++) {
+        for (int j = 0; j < 10; j++) {
+            for (int k = 0; k < 100; k++) {
+                instancePositions.push_back(glm::vec3(i * 1.0f, j * 1.0f, k * 1.0f));
             }
         }
     }
 
     // Connect instance VBO to model VAO
-    // 0. pos, 1. color, 2. tex coords, 3. normal,  
+    // 0. pos, 1. color, 2. tex coords, 3. normal,
     // 4. instance position
     GLuint instanceVBO;
     glGenBuffers(1, &instanceVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO); // Make sure this is bound
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);  // Make sure this is bound
     glBufferData(GL_ARRAY_BUFFER, instancePositions.size() * sizeof(glm::vec3), instancePositions.data(), GL_STATIC_DRAW);
 
     // Main loop
@@ -641,34 +635,33 @@ int main() {
 
         // Pass 1: rendering with MSAA
         glBindFramebuffer(GL_FRAMEBUFFER, fboMSAA);
-        glViewport(0,0,SCR_WIDTH, SCR_HEIGHT);
+        glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
         glEnable(GL_DEPTH_TEST);
         glClearColor(0.05f, 0.07f, 0.09f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 
         // Render the cubemap
         if (false) {
             // Don't affect the depth buffer
             glDepthMask(GL_FALSE);
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
 
-                // Get the view and projection matrices from the camera
-                glm::mat4 view = camera.GetNoTranslationViewMatrix();
-                // view = camera.GetViewMatrix();
-                glm::mat4 projection = camera.GetProjectionMatrix();
+            // Get the view and projection matrices from the camera
+            glm::mat4 view = camera.GetNoTranslationViewMatrix();
+            // view = camera.GetViewMatrix();
+            glm::mat4 projection = camera.GetProjectionMatrix();
 
-                skyboxShader.use();
-                skyboxShader.uniform_int("skybox", 0);
-                skyboxShader.uniform_mat4fv("view", glm::value_ptr(view));
-                // skyboxShader.uniform_mat4fv("projection", glm::value_ptr(projection));
-                skyboxShader.uniform_mat4fv("matrix", glm::value_ptr(projection * view));
-                // camera.Matrix(skyboxShader);
+            skyboxShader.use();
+            skyboxShader.uniform_int("skybox", 0);
+            skyboxShader.uniform_mat4fv("view", glm::value_ptr(view));
+            // skyboxShader.uniform_mat4fv("projection", glm::value_ptr(projection));
+            skyboxShader.uniform_mat4fv("matrix", glm::value_ptr(projection * view));
+            // camera.Matrix(skyboxShader);
 
-                skyboxVAO.bind(); // TODO: Fix this debug using renderdoc
-                VAO1.bind();
-                glDrawArrays(GL_TRIANGLES, 0, 36);
+            skyboxVAO.bind();  // TODO: Fix this debug using renderdoc
+            VAO1.bind();
+            glDrawArrays(GL_TRIANGLES, 0, 36);
             glDepthMask(GL_TRUE);
         }
 
@@ -745,7 +738,7 @@ int main() {
                 glEnable(GL_CULL_FACE);
                 glCullFace(GL_FRONT);
                 glDrawArrays(GL_TRIANGLES, 0, 36);
-                glDisable(GL_CULL_FACE); // reset
+                glDisable(GL_CULL_FACE);  // reset
             }
 
             // render the loaded model
@@ -774,17 +767,17 @@ int main() {
 
             float scaleFactor = 0.04f;
             float zRotation = 45.0f;
-            
+
             // Plane
             {
                 float tiling = 0.5f;
                 floor_texture.bind(GL_TEXTURE0);
-                    // white texture override
-                    white_texture.bind(GL_TEXTURE0);
+                // white texture override
+                white_texture.bind(GL_TEXTURE0);
                 floor_spec_texture.bind(GL_TEXTURE1);
                 currentShader.use();
                 glm::mat4 model = glm::mat4(1.0f);
-                model = glm::scale(model, glm::vec3(scaleFactor));      // it's a bit too big for our scene, so scale it down
+                model = glm::scale(model, glm::vec3(scaleFactor));  // it's a bit too big for our scene, so scale it down
                 model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
                 currentShader.uniform_mat4("model", glm::value_ptr(model));
                 currentShader.uniform_2f("tiling", tiling, tiling);
@@ -793,15 +786,15 @@ int main() {
             }
 
             // Cubes Pile
-            if(false) {
+            if (false) {
                 float tiling = 1.00f;
                 veneer_texture.bind(GL_TEXTURE0);
-                    // white texture override
-                    white_texture.bind(GL_TEXTURE0);
+                // white texture override
+                white_texture.bind(GL_TEXTURE0);
                 veneer_spec_texture.bind(GL_TEXTURE1);
                 currentShader.use();
                 glm::mat4 model = glm::mat4(1.0f);
-                model = glm::scale(model, glm::vec3(scaleFactor));      // it's a bit too big for our scene, so scale it down
+                model = glm::scale(model, glm::vec3(scaleFactor));  // it's a bit too big for our scene, so scale it down
                 model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
                 currentShader.uniform_mat4("model", glm::value_ptr(model));
                 currentShader.uniform_2f("tiling", tiling, tiling);
@@ -811,12 +804,13 @@ int main() {
 
             // Suzanne
             {
-                float tiling = 0.1f;;
+                float tiling = 0.1f;
+                ;
                 white_texture.bind(GL_TEXTURE0);
                 white_specular_texture.bind(GL_TEXTURE1);
                 currentShader.use();
                 glm::mat4 model = glm::mat4(1.0f);
-                model = glm::scale(model, glm::vec3(scaleFactor));      // it's a bit too big for our scene, so scale it down
+                model = glm::scale(model, glm::vec3(scaleFactor));  // it's a bit too big for our scene, so scale it down
                 model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
                 currentShader.uniform_mat4("model", glm::value_ptr(model));
                 currentShader.uniform_2f("tiling", tiling, tiling);
@@ -829,7 +823,7 @@ int main() {
                 VAO1.bind();
                 VBO1.bind();
                 float lightScale = 0.03f;
-                for(int i = 0; i < NR_POINT_LIGHTS; i++) {
+                for (int i = 0; i < NR_POINT_LIGHTS; i++) {
                     // light matrix
                     glm::vec3 lightPos = pointLightPositions[i];
                     glm::vec3 lightColor = pointLightColors[i];
@@ -849,30 +843,30 @@ int main() {
         if (true) {
             // Render the shadow map
             if (true) {
-
                 glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFBO);
-                glViewport(0,0,SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT);
+                glViewport(0, 0, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT);
                 glClear(GL_DEPTH_BUFFER_BIT);
-
 
                 shadowMapShader.use();
                 // recalculate the lightSpaceMatrix
-                lightView = glm::lookAt(DirLightPos, 
-                                      glm::vec3( 0.0f, 0.0f,  0.0f), 
-                                      glm::vec3( 0.0f, 1.0f,  0.0f));
+                lightView = glm::lookAt(DirLightPos,
+                                        glm::vec3(0.0f, 0.0f, 0.0f),
+                                        glm::vec3(0.0f, 1.0f, 0.0f));
 
                 lightSpaceMatrix = lightProjection * lightView;
 
                 shadowMapShader.uniform_mat4("lightSpaceMatrix", glm::value_ptr(lightSpaceMatrix));
                 // Render the scene with shadowMapShader from the pov of the light
                 float scaleFactor = 0.04f;
-                float zRotation = 45.0f;
-                
+                // float zRotation = 45.0f;
+
+                // float scaleFactor = 1.0f;
+                float zRotation = 0.0f;
                 // Plane
                 {
                     shadowMapShader.use();
                     glm::mat4 model = glm::mat4(1.0f);
-                    model = glm::scale(model, glm::vec3(scaleFactor));      // it's a bit too big for our scene, so scale it down
+                    model = glm::scale(model, glm::vec3(scaleFactor));  // it's a bit too big for our scene, so scale it down
                     model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
                     shadowMapShader.uniform_mat4("model", glm::value_ptr(model));
                     // camera.Matrix(currentShader);
@@ -880,10 +874,10 @@ int main() {
                 }
 
                 // Cubes Pile
-                if(true) {
+                if (true) {
                     shadowMapShader.use();
                     glm::mat4 model = glm::mat4(1.0f);
-                    model = glm::scale(model, glm::vec3(scaleFactor));      // it's a bit too big for our scene, so scale it down
+                    model = glm::scale(model, glm::vec3(scaleFactor));  // it's a bit too big for our scene, so scale it down
                     model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
                     shadowMapShader.uniform_mat4("model", glm::value_ptr(model));
                     // camera.Matrix(currentShader);
@@ -892,10 +886,11 @@ int main() {
                 }
 
                 // Suzanne
+
                 {
                     shadowMapShader.use();
                     glm::mat4 model = glm::mat4(1.0f);
-                    model = glm::scale(model, glm::vec3(scaleFactor));      // it's a bit too big for our scene, so scale it down
+                    model = glm::scale(model, glm::vec3(scaleFactor));  // it's a bit too big for our scene, so scale it down
                     model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
                     shadowMapShader.uniform_mat4("model", glm::value_ptr(model));
                     // camera.Matrix(currentShader);
@@ -907,7 +902,7 @@ int main() {
 
             // Render the scene normally
             glBindFramebuffer(GL_FRAMEBUFFER, fboMSAA);
-            glViewport(0,0,SCR_WIDTH, SCR_HEIGHT);
+            glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
             glEnable(GL_DEPTH_TEST);
             glClearColor(0.05f, 0.07f, 0.09f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -926,29 +921,34 @@ int main() {
             currentShader.use();
 
             // recalculate the lightSpaceMatrix
-            lightView = glm::lookAt(DirLightPos, 
-                glm::vec3( 0.0f, 0.0f,  0.0f), 
-                glm::vec3( 0.0f, 1.0f,  0.0f));
-                lightSpaceMatrix = lightProjection * lightView;
-                
+            lightView = glm::lookAt(DirLightPos,
+                                    glm::vec3(0.0f, 0.0f, 0.0f),
+                                    glm::vec3(0.0f, 1.0f, 0.0f));
+            lightSpaceMatrix = lightProjection * lightView;
+
             // shadow map uniforms
             currentShader.uniform_mat4("lightSpaceMatrix", glm::value_ptr(lightSpaceMatrix));
             currentShader.uniform_int("shadowMap", 2);
+            currentShader.uniform_1f("bias", gui.shadow_bias);
+
 
             float scaleFactor = 0.04f;
-            float zRotation = 45.0f;
-            
+            // float zRotation = 45.0f;
+
+            // float scaleFactor = 1.0f;
+            float zRotation = 0.0f;
+
             // Plane
             {
                 float tiling = 0.5f;
 
                 floor_texture.bind(GL_TEXTURE0);
-                    // white texture override
-                    white_texture.bind(GL_TEXTURE0);
+                // white texture override
+                white_texture.bind(GL_TEXTURE0);
                 floor_spec_texture.bind(GL_TEXTURE1);
                 currentShader.use();
                 glm::mat4 model = glm::mat4(1.0f);
-                model = glm::scale(model, glm::vec3(scaleFactor));      // it's a bit too big for our scene, so scale it down
+                model = glm::scale(model, glm::vec3(scaleFactor));  // it's a bit too big for our scene, so scale it down
                 model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
                 currentShader.uniform_mat4("model", glm::value_ptr(model));
                 currentShader.uniform_2f("tiling", tiling, tiling);
@@ -957,15 +957,15 @@ int main() {
             }
 
             // Cubes Pile
-            if(true) {
+            if (true) {
                 float tiling = 1.00f;
                 veneer_texture.bind(GL_TEXTURE0);
-                    // white texture override
-                    white_texture.bind(GL_TEXTURE0);
+                // white texture override
+                white_texture.bind(GL_TEXTURE0);
                 veneer_spec_texture.bind(GL_TEXTURE1);
                 currentShader.use();
                 glm::mat4 model = glm::mat4(1.0f);
-                model = glm::scale(model, glm::vec3(scaleFactor));      // it's a bit too big for our scene, so scale it down
+                model = glm::scale(model, glm::vec3(scaleFactor));  // it's a bit too big for our scene, so scale it down
                 model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
                 currentShader.uniform_mat4("model", glm::value_ptr(model));
                 currentShader.uniform_2f("tiling", tiling, tiling);
@@ -975,12 +975,13 @@ int main() {
 
             // Suzanne
             {
-                float tiling = 0.1f;;
+                float tiling = 0.1f;
+                ;
                 white_texture.bind(GL_TEXTURE0);
                 white_specular_texture.bind(GL_TEXTURE1);
                 currentShader.use();
                 glm::mat4 model = glm::mat4(1.0f);
-                model = glm::scale(model, glm::vec3(scaleFactor));      // it's a bit too big for our scene, so scale it down
+                model = glm::scale(model, glm::vec3(scaleFactor));  // it's a bit too big for our scene, so scale it down
                 model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
                 currentShader.uniform_mat4("model", glm::value_ptr(model));
                 currentShader.uniform_2f("tiling", tiling, tiling);
@@ -988,12 +989,13 @@ int main() {
                 cubePileSuzanneModel.Draw(currentShader);
             }
 
+
             // Lights
             {
                 VAO1.bind();
                 VBO1.bind();
                 float lightScale = 0.03f;
-                for(int i = 0; i < NR_POINT_LIGHTS; i++) {
+                for (int i = 0; i < NR_POINT_LIGHTS; i++) {
                     // light matrix
                     glm::vec3 lightPos = pointLightPositions[i];
                     glm::vec3 lightColor = pointLightColors[i];
@@ -1005,6 +1007,121 @@ int main() {
                     lightShader.uniform_mat4("model", glm::value_ptr(light_model));
                     camera.Matrix(lightShader);
                     glDrawArrays(GL_TRIANGLES, 0, 36);
+                }
+            }
+        }
+
+        // gpt
+        if (false) {
+            // --------------------------------------------------------
+            // SHARED TRANSFORMS (used in BOTH passes)
+            // --------------------------------------------------------
+            float scaleFactor = 0.04f;
+            float yRotation = 30.0f;
+
+            glm::mat4 sharedModel = glm::mat4(1.0f);
+            sharedModel = glm::scale(sharedModel, glm::vec3(scaleFactor));
+            sharedModel = glm::rotate(sharedModel, glm::radians(yRotation), glm::vec3(0, 1, 0));
+
+            // --------------------------------------------------------
+            // DEFINE A SCENE CENTER (IMPORTANT)
+            // --------------------------------------------------------
+            glm::vec3 sceneCenterWS = glm::vec3(sharedModel * glm::vec4(0, 0, 0, 1));
+
+            // --------------------------------------------------------
+            // LIGHT SETUP (SWITCH BETWEEN THESE TWO)
+            // --------------------------------------------------------
+
+            // ===== OPTION A: YOUR CURRENT METHOD =====
+            if (false) {
+                lightView = glm::lookAt(
+                    DirLightPos,
+                    glm::vec3(0.0f, 0.0f, 0.0f),
+                    glm::vec3(0.0f, 1.0f, 0.0f));
+            }
+
+            // ===== OPTION B: SCENE-CENTERED DIRECTIONAL LIGHT =====
+            if (true) {
+                glm::vec3 lightDir = glm::normalize(glm::vec3(-1.0f, -1.0f, -0.3f));
+                float lightDistance = 6.0f;
+
+                glm::vec3 lightPos = sceneCenterWS - lightDir * lightDistance;
+
+                lightView = glm::lookAt(
+                    lightPos,
+                    sceneCenterWS,
+                    glm::vec3(0.0f, 1.0f, 0.0f));
+            }
+
+            // --------------------------------------------------------
+            // LIGHT PROJECTION (INTENTIONALLY FIXED)
+            // --------------------------------------------------------
+            float orthoSize = 4.0f;
+            lightProjection = glm::ortho(
+                -orthoSize, orthoSize,
+                -orthoSize, orthoSize,
+                0.1f, 15.0f);
+
+            lightSpaceMatrix = lightProjection * lightView;
+
+            // ========================================================
+            // 1️⃣ SHADOW MAP PASS
+            // ========================================================
+            if (true) {
+                glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFBO);
+                glViewport(0, 0, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT);
+                glClear(GL_DEPTH_BUFFER_BIT);
+
+                shadowMapShader.use();
+                shadowMapShader.uniform_mat4("lightSpaceMatrix", glm::value_ptr(lightSpaceMatrix));
+
+                // ---- Plane ----
+                {
+                    shadowMapShader.uniform_mat4("model", glm::value_ptr(sharedModel));
+                    cubePilePlaneModel.Draw(shadowMapShader);
+                }
+
+                // ---- Suzanne ----
+                {
+                    shadowMapShader.uniform_mat4("model", glm::value_ptr(sharedModel));
+                    cubePileSuzanneModel.Draw(shadowMapShader);
+                }
+
+                glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            }
+
+            // ========================================================
+            // 2️⃣ MAIN RENDER PASS
+            // ========================================================
+            if (true) {
+                glBindFramebuffer(GL_FRAMEBUFFER, fboMSAA);
+                glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+                glEnable(GL_DEPTH_TEST);
+                glClearColor(0.05f, 0.07f, 0.09f, 1.0f);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+                // Bind shadow map
+                glActiveTexture(GL_TEXTURE2);
+                glBindTexture(GL_TEXTURE_2D, shadowMap);
+
+                currentShader.use();
+                currentShader.uniform_mat4("lightSpaceMatrix", glm::value_ptr(lightSpaceMatrix));
+                currentShader.uniform_int("shadowMap", 2);
+
+                camera.Matrix(currentShader);
+
+                // ---- Plane ----
+                {
+                    currentShader.uniform_mat4("model", glm::value_ptr(sharedModel));
+                    currentShader.uniform_2f("tiling", 0.5f, 0.5f);
+                    cubePilePlaneModel.Draw(currentShader);
+                }
+
+                // ---- Suzanne ----
+                {
+                    currentShader.uniform_mat4("model", glm::value_ptr(sharedModel));
+                    currentShader.uniform_2f("tiling", 1.0f, 1.0f);
+                    cubePileSuzanneModel.Draw(currentShader);
                 }
             }
         }
@@ -1025,20 +1142,19 @@ int main() {
                 floor_spec_texture.bind(GL_TEXTURE1);
                 currentShader.use();
                 glm::mat4 model = glm::mat4(1.0f);
-                model = glm::scale(model, glm::vec3(scaleFactor));      // it's a bit too big for our scene, so scale it down
+                model = glm::scale(model, glm::vec3(scaleFactor));  // it's a bit too big for our scene, so scale it down
                 model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
                 currentShader.uniform_mat4("model", glm::value_ptr(model));
                 camera.Matrix(currentShader);
                 // cubePilePlaneModel.Draw(currentShader);
             }
 
-            
             // Lights
             {
                 VAO1.bind();
                 VBO1.bind();
                 float lightScale = 0.03f;
-                for(int i = 0; i < NR_POINT_LIGHTS; i++) {
+                for (int i = 0; i < NR_POINT_LIGHTS; i++) {
                     // light matrix
                     glm::vec3 lightPos = pointLightPositions[i];
                     glm::vec3 lightColor = pointLightColors[i];
@@ -1057,11 +1173,11 @@ int main() {
             float windowScale = 0.003f;
             // Create a vector of positions for the windows
             {
-                for(int i=0; i<10; i++) {
+                for (int i = 0; i < 10; i++) {
                     glm::mat4 model = glm::mat4(1.0f);
                     model = glm::scale(model, glm::vec3(1.0f, -1.0f, 1.0f));
                     model = glm::scale(model, glm::vec3(windowScale));
-                    model = glm::translate(model,glm::vec3((i+1) * 15.0f-100.0f, (i+1) * -15.0f, 0.0f));
+                    model = glm::translate(model, glm::vec3((i + 1) * 15.0f - 100.0f, (i + 1) * -15.0f, 0.0f));
                     windowModels.push_back(model);
                 }
             }
@@ -1070,7 +1186,7 @@ int main() {
                 VAO1.bind();
                 VBO1.bind();
                 float lightScale = 0.01f;
-                for(int i = 0; i < windowModels.size(); i++) {
+                for (int i = 0; i < windowModels.size(); i++) {
                     // light matrix
                     // glm::vec3 lightPos = windowPositions[i];
                     // glm::vec3 lightColor = pointLightColors[i];
@@ -1089,19 +1205,17 @@ int main() {
                 }
             }
 
-
-            
             // Sort the windows by distance from the camera
             // std::sort(windowPositions.begin(), windowPositions.end(), [&camera](glm::vec3 a, glm::vec3 b) {
             //     return glm::length(a - camera.Position) > glm::length(b - camera.Position);
             // });
             std::sort(windowModels.begin(), windowModels.end(),
-                [&camera](const glm::mat4& a, const glm::mat4& b) {
-                    glm::vec3 posA = glm::vec3(a[3]); // extract world position
-                    glm::vec3 posB = glm::vec3(b[3]);
-                    return glm::length(posA - camera.Position) > glm::length(posB - camera.Position);
-            });
-            
+                      [&camera](const glm::mat4& a, const glm::mat4& b) {
+                          glm::vec3 posA = glm::vec3(a[3]);  // extract world position
+                          glm::vec3 posB = glm::vec3(b[3]);
+                          return glm::length(posA - camera.Position) > glm::length(posB - camera.Position);
+                      });
+
             // print the distances between the windows and the camera for debugging
             // for(int i=0; i<windowPositions.size(); i++) {
             //     std::cout <<i<< "Pos: " << windowPositions[i].x << " " << windowPositions[i].y << " " << windowPositions[i].z << std::endl;
@@ -1113,7 +1227,7 @@ int main() {
                 window_texture.bind(GL_TEXTURE0);
                 white_specular_texture.bind(GL_TEXTURE1);
                 glassShader.use();
-                for(int i=0; i<windowModels.size(); i++) {
+                for (int i = 0; i < windowModels.size(); i++) {
                     glm::mat4 model = windowModels[i];
                     glassShader.uniform_mat4("model", glm::value_ptr(model));
                     float tiling = 0.1f * 0.25f;
@@ -1133,12 +1247,12 @@ int main() {
             // Suzanne
             {
                 float tiling = 0.1f;
-                float amount = 0.06f; // strength of the explode effect
+                float amount = 0.06f;  // strength of the explode effect
                 glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
                 skyboxReflectiveShader.use();
                 glm::mat4 model = glm::mat4(1.0f);
-                model = glm::scale(model, glm::vec3(scaleFactor));      // it's a bit too big for our scene, so scale it down
+                model = glm::scale(model, glm::vec3(scaleFactor));  // it's a bit too big for our scene, so scale it down
                 model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
                 skyboxReflectiveShader.uniform_mat4("model", glm::value_ptr(model));
                 skyboxReflectiveShader.uniform_mat4fv("view", glm::value_ptr(camera.GetViewMatrix()));
@@ -1148,31 +1262,31 @@ int main() {
             }
 
             // Suzanne Normal Viz
-            if(true){
-                float normalLength = 0.003f; // length of normal lines
-                
+            if (true) {
+                float normalLength = 0.003f;  // length of normal lines
+
                 normalDebugShader.use();
                 glm::mat4 model = glm::mat4(1.0f);
-                model = glm::scale(model, glm::vec3(scaleFactor));      // same scale as main render
+                model = glm::scale(model, glm::vec3(scaleFactor));  // same scale as main render
                 model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
-                
+
                 normalDebugShader.uniform_mat4("model", glm::value_ptr(model));
                 normalDebugShader.uniform_mat4fv("view", glm::value_ptr(camera.GetViewMatrix()));
                 normalDebugShader.uniform_mat4fv("projection", glm::value_ptr(camera.GetProjectionMatrix()));
                 normalDebugShader.uniform_1f("normalLength", normalLength);
-                
+
                 // Optional: make lines thicker for better visibility
                 glLineWidth(1.0f);
-                
+
                 cubePileSuzanneModel.Draw(normalDebugShader);
             }
 
             // Lights
-            if (false){
+            if (false) {
                 VAO1.bind();
                 VBO1.bind();
                 float lightScale = 0.03f;
-                for(int i = 0; i < NR_POINT_LIGHTS; i++) {
+                for (int i = 0; i < NR_POINT_LIGHTS; i++) {
                     // light matrix
                     glm::vec3 lightPos = pointLightPositions[i];
                     glm::vec3 lightColor = pointLightColors[i];
@@ -1188,13 +1302,12 @@ int main() {
             }
         }
 
-        // Instancing scene 
+        // Instancing scene
         if (false) {
-
-            glBindBuffer(GL_ARRAY_BUFFER, instanceVBO); // Make sure this is bound
+            glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);  // Make sure this is bound
             // bind to VAO (we want to add a new attribute)
             VAO1.bind();
-            glEnableVertexAttribArray(4); // use location 4 for instance offset
+            glEnableVertexAttribArray(4);  // use location 4 for instance offset
             glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
 
             // tell OpenGL this(4th attrib) advances once per instance
@@ -1235,7 +1348,7 @@ int main() {
             currentShader.uniform_int("material.specular", 1);
             camera.Matrix(currentShader);
             camera.UpdatePositionInShader(currentShader);
-            for(auto& pos : instancePositions) {
+            for (auto& pos : instancePositions) {
                 glm::mat4 model = glm::mat4(1.0f);
                 model = glm::scale(model, glm::vec3(0.01f));
                 model = glm::translate(model, glm::vec3(-4.0f, -8.0f, -4.0f));
@@ -1254,7 +1367,7 @@ int main() {
 
             float scaleFactor = -0.02f;
             float zRotation = 45.0f;
-            
+
             // Plane
             {
                 float tiling = 0.301001f;
@@ -1265,7 +1378,7 @@ int main() {
                 // white_specular_texture.bind(GL_TEXTURE1);
                 normalMapShader.use();
                 glm::mat4 model = glm::mat4(1.0f);
-                model = glm::scale(model, glm::vec3(scaleFactor));      // it's a bit too big for our scene, so scale it down
+                model = glm::scale(model, glm::vec3(scaleFactor));  // it's a bit too big for our scene, so scale it down
                 model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
                 model = glm::translate(model, glm::vec3(0.0f, -24.0f, 0.0f));
                 normalMapShader.uniform_mat4("model", glm::value_ptr(model));
@@ -1279,7 +1392,7 @@ int main() {
                 VAO1.bind();
                 VBO1.bind();
                 float lightScale = 0.02f;
-                for(int i = 0; i < NR_POINT_LIGHTS; i++) {
+                for (int i = 0; i < NR_POINT_LIGHTS; i++) {
                     // light matrix
                     glm::vec3 lightPos = pointLightPositions[i];
                     glm::vec3 lightColor = pointLightColors[i];
@@ -1300,18 +1413,18 @@ int main() {
             glBindFramebuffer(GL_READ_FRAMEBUFFER, fboMSAA);
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
             glBlitFramebuffer(0, 0, SCR_WIDTH, SCR_HEIGHT,
-                  0, 0, SCR_WIDTH, SCR_HEIGHT,
-                  GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-            
+                              0, 0, SCR_WIDTH, SCR_HEIGHT,
+                              GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
 
         // Pass 3: Post Processing
-        if (true) { 
+        if (true) {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            glViewport(0,0,SCR_WIDTH, SCR_HEIGHT);
-            glDisable(GL_DEPTH_TEST); // usually not needed for full-screen triangle
-            glClearColor(0.0f,0.0f,0.0f,1.0f);
+            glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+            glDisable(GL_DEPTH_TEST);  // usually not needed for full-screen triangle
+            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             // bind textures
@@ -1328,7 +1441,6 @@ int main() {
             glBindVertexArray(fullscreenQuadVAO);
             glDrawArrays(GL_TRIANGLES, 0, 6);
             glBindVertexArray(0);
-
         }
 
         //////////////////////////////////// UI ////////////////////////////////////
@@ -1340,11 +1452,11 @@ int main() {
         glfwSwapBuffers(window);
         glfwPollEvents();
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        
+
         frameNumber++;
-        
+
     }  // Main loop end
-    
+
     // Cleanup and terminate
     VAO1.remove();
     VBO1.remove();
@@ -1353,10 +1465,10 @@ int main() {
     container_specular_texture.remove();
     white_texture.remove();
     white_specular_texture.remove();
-    
+
     gui.cleanup();
     glfwTerminate();
-    glDeleteFramebuffers(1, &fbo);  
+    glDeleteFramebuffers(1, &fbo);
 
     return 0;
 }

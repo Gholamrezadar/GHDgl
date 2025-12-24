@@ -88,6 +88,7 @@ void MyGUI3::modelRotationUI(Shader & flatTextureShader)
     ImGui::DragFloat3("Directional Light Position",
                   glm::value_ptr(*DirLightPos),
                   0.1f); // speed
+    ImGui::DragFloat("Bias", &shadow_bias, 0.00001f, 0.0f, 0.006f, "%.6f");
     ImGui::End();
 }
 

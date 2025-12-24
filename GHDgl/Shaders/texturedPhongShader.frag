@@ -30,6 +30,7 @@ uniform sampler2D texture1;
 uniform vec3 viewPos; // Camera position
 uniform vec2 tiling;
 uniform sampler2D shadowMap;
+uniform float bias;
 
 
 in vec3 vertexColor;
@@ -59,17 +60,20 @@ float ShadowCalculation(vec4 fragPosLightSpace)
     // return shadow;
 
     // PCF (Percentage-Closer Filtering)
-    float shadow = 0.0;
-    vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
-    for(int x = -1; x <= 1; ++x)
-    {
-        for(int y = -1; y <= 1; ++y)
-        {
-            float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
-            shadow += currentDepth - 0.005 > pcfDepth ? 1.0 : 0.0;
-        }
-    }
-    shadow /= 9.0;
+    // float shadow = 0.0;
+    // vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+    // for(int x = -1; x <= 1; ++x)
+    // {
+    //     for(int y = -1; y <= 1; ++y)
+    //     {
+    //         float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
+    //         shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
+    //     }
+    // }
+    // shadow /= 9.0;
+
+    float shadow=0.0f;
+    shadow = currentDepth - bias > texture(shadowMap, projCoords.xy).r ? 1.0 : 0.0;
 
     return shadow;
 }
@@ -130,10 +134,11 @@ void main()
     //result = vec3(max(dot(norm, viewDir), 0.0));
     //result = vec3(norm);
     // float shadow = ShadowCalculation(FragPosLightSpace);
-
-    // result = vec3(shadow);
+    // result = vec3(1.0-shadow);
 
     FragColor = vec4(result, 1.0);
+    // FragColor = vec4(norm, 1.0);
+
 }
 
 
