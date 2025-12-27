@@ -89,6 +89,9 @@ void MyGUI3::modelRotationUI(Shader & flatTextureShader)
                   glm::value_ptr(*DirLightPos),
                   0.1f); // speed
     ImGui::DragFloat("Bias", &shadow_bias, 0.00001f, 0.0f, 0.006f, "%.6f");
+    ImGui::DragFloat("Near plane", &near_plane, 0.1f, 0.0f, 50.0f, "%.3f");
+    ImGui::DragFloat("Far plane", &far_plane, 0.1f, 0.0f, 50.0f, "%.3f");
+    ImGui::DragFloat("Ortho size", &ortho_size, 0.1f, 0.0f, 50.0f, "%.3f");
     ImGui::End();
 }
 

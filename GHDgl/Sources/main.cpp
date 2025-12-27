@@ -1,6 +1,10 @@
 #define GLAD_GL_IMPLEMENTATION
 
+// autoformatter kept placing this under glfw3 which is problematic
+#if true
 #include <glad/glad.h>
+#endif
+
 #include <GLFW/glfw3.h>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
@@ -12,6 +16,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
+
+
+
 
 #include "Camera.h"
 #include "EBO.h"
@@ -551,19 +558,21 @@ int main() {
 #pragma region Directional Shadow Map
     unsigned int shadowMapFBO;
     unsigned int shadowMap;
-    constexpr int SHADOW_MAP_WIDTH = 1024 * 4;
-    constexpr int SHADOW_MAP_HEIGHT = 1024 * 4;
+    constexpr int SHADOW_MAP_WIDTH = 1024 * 8;
+    constexpr int SHADOW_MAP_HEIGHT = 1024 * 8;
     glGenFramebuffers(1, &shadowMapFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFBO);
     glGenTextures(1, &shadowMap);
     glBindTexture(GL_TEXTURE_2D, shadowMap);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+
     // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
     // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, glm::value_ptr(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)));
     // imgui display swizzle hack (r, 0, 0, 1) -> (r, r, r, 1)
     GLint swizzleMask[] = {GL_RED, GL_RED, GL_RED, GL_ONE};
     glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
@@ -575,6 +584,11 @@ int main() {
     float near_plane = 0.10f;
     float far_plane = 10.0f;
     float ortho_size = 1.50f;
+
+    // get shadow map params from gui
+    near_plane = gui.near_plane;
+    far_plane = gui.far_plane;
+    ortho_size = gui.ortho_size;
 
     glm::vec3 DirLightPos = glm::vec3(4.9f, 1.8f, 0.0f);
     glm::mat4 lightProjection = glm::ortho(-ortho_size, ortho_size, -ortho_size, ortho_size, near_plane, far_plane);
@@ -842,27 +856,33 @@ int main() {
 
         // Cubes Pile Scene (Shadow Map)
         if (true) {
+            // recalculate the lightSpaceMatrix from gui
+            glm::mat4 lightProjection = glm::ortho(-gui.ortho_size, gui.ortho_size, -gui.ortho_size, gui.ortho_size, gui.near_plane, gui.far_plane);
+            // recalculate the lightSpaceMatrix
+            lightView = glm::lookAt(DirLightPos,
+                                    glm::vec3(0.0f, 0.0f, 0.0f),
+                                    glm::vec3(0.0f, 1.0f, 0.0f));
+
+            lightSpaceMatrix = lightProjection * lightView;
+            float scaleFactor = 0.04f;
+            float zRotation = 45.0f;
+
             // Render the shadow map
             if (true) {
                 glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFBO);
                 glViewport(0, 0, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT);
                 glClear(GL_DEPTH_BUFFER_BIT);
+                glEnable(GL_POLYGON_OFFSET_FILL); // disable later
+                glPolygonOffset(3.0f, 6.0f);
+                // glEnable(GL_CULL_FACE);
+                // glCullFace(GL_FRONT); // disable later
+
 
                 shadowMapShader.use();
-                // recalculate the lightSpaceMatrix
-                lightView = glm::lookAt(DirLightPos,
-                                        glm::vec3(0.0f, 0.0f, 0.0f),
-                                        glm::vec3(0.0f, 1.0f, 0.0f));
-
-                lightSpaceMatrix = lightProjection * lightView;
-
                 shadowMapShader.uniform_mat4("lightSpaceMatrix", glm::value_ptr(lightSpaceMatrix));
                 // Render the scene with shadowMapShader from the pov of the light
-                float scaleFactor = 0.04f;
+                // float scaleFactor = 0.04f;
                 // float zRotation = 45.0f;
-
-                // float scaleFactor = 1.0f;
-                float zRotation = 0.0f;
                 // Plane
                 {
                     shadowMapShader.use();
@@ -875,7 +895,7 @@ int main() {
                 }
 
                 // Cubes Pile
-                if (true) {
+                if (false) {
                     shadowMapShader.use();
                     glm::mat4 model = glm::mat4(1.0f);
                     model = glm::scale(model, glm::vec3(scaleFactor));  // it's a bit too big for our scene, so scale it down
@@ -899,120 +919,108 @@ int main() {
                 }
 
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
-                glCullFace(GL_BACK); // don't forget to reset original culling face
-
+                // glCullFace(GL_BACK); // don't forget to reset original culling face
+                // glDisable(GL_CULL_FACE);
+                glDisable(GL_POLYGON_OFFSET_FILL);
             }
 
             // Render the scene normally
-            glBindFramebuffer(GL_FRAMEBUFFER, fboMSAA);
-            glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
-            glEnable(GL_DEPTH_TEST);
-            glClearColor(0.05f, 0.07f, 0.09f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-            // backface trick
-            glEnable(GL_FRONT);
-
-            // white texture override
-            white_texture.bind(GL_TEXTURE0);
-            white_specular_texture.bind(GL_TEXTURE1);
-
-            container_texture.bind(GL_TEXTURE0);
-            container_specular_texture.bind(GL_TEXTURE1);
-
-            // bind shadow map (as texture "2")
-            glActiveTexture(GL_TEXTURE2);
-            glBindTexture(GL_TEXTURE_2D, shadowMap);
-
-            currentShader.use();
-
-            // recalculate the lightSpaceMatrix
-            lightView = glm::lookAt(DirLightPos,
-                                    glm::vec3(0.0f, 0.0f, 0.0f),
-                                    glm::vec3(0.0f, 1.0f, 0.0f));
-            lightSpaceMatrix = lightProjection * lightView;
-
-            // shadow map uniforms
-            currentShader.uniform_mat4("lightSpaceMatrix", glm::value_ptr(lightSpaceMatrix));
-            currentShader.uniform_int("shadowMap", 2);
-            currentShader.uniform_1f("bias", gui.shadow_bias);
-
-
-            float scaleFactor = 0.04f;
-            // float zRotation = 45.0f;
-
-            // float scaleFactor = 1.0f;
-            float zRotation = 0.0f;
-
-            // Plane
-            {
-                float tiling = 0.5f;
-
-                floor_texture.bind(GL_TEXTURE0);
-                // white texture override
-                white_texture.bind(GL_TEXTURE0);
-                floor_spec_texture.bind(GL_TEXTURE1);
-                currentShader.use();
-                glm::mat4 model = glm::mat4(1.0f);
-                model = glm::scale(model, glm::vec3(scaleFactor));  // it's a bit too big for our scene, so scale it down
-                model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
-                currentShader.uniform_mat4("model", glm::value_ptr(model));
-                currentShader.uniform_2f("tiling", tiling, tiling);
-                camera.Matrix(currentShader);
-                cubePilePlaneModel.Draw(currentShader);
-            }
-
-            // Cubes Pile
             if (true) {
-                float tiling = 1.00f;
-                veneer_texture.bind(GL_TEXTURE0);
-                // white texture override
-                white_texture.bind(GL_TEXTURE0);
-                veneer_spec_texture.bind(GL_TEXTURE1);
-                currentShader.use();
-                glm::mat4 model = glm::mat4(1.0f);
-                model = glm::scale(model, glm::vec3(scaleFactor));  // it's a bit too big for our scene, so scale it down
-                model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
-                currentShader.uniform_mat4("model", glm::value_ptr(model));
-                currentShader.uniform_2f("tiling", tiling, tiling);
-                camera.Matrix(currentShader);
-                cubePileModel.Draw(currentShader);
-            }
+                glBindFramebuffer(GL_FRAMEBUFFER, fboMSAA);
+                glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+                glEnable(GL_DEPTH_TEST);
+                glClearColor(0.05f, 0.07f, 0.09f, 1.0f);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            // Suzanne
-            {
-                float tiling = 0.1f;
-                ;
+                // backface trick
+                // glEnable(GL_FRONT);
+
+                // white texture override
                 white_texture.bind(GL_TEXTURE0);
                 white_specular_texture.bind(GL_TEXTURE1);
+
+                container_texture.bind(GL_TEXTURE0);
+                container_specular_texture.bind(GL_TEXTURE1);
+
+                // bind shadow map (as texture "2")
+                glActiveTexture(GL_TEXTURE2);
+                glBindTexture(GL_TEXTURE_2D, shadowMap);
+
                 currentShader.use();
-                glm::mat4 model = glm::mat4(1.0f);
-                model = glm::scale(model, glm::vec3(scaleFactor));  // it's a bit too big for our scene, so scale it down
-                model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
-                currentShader.uniform_mat4("model", glm::value_ptr(model));
-                currentShader.uniform_2f("tiling", tiling, tiling);
-                camera.Matrix(currentShader);
-                cubePileSuzanneModel.Draw(currentShader);
-            }
 
+                // shadow map uniforms
+                currentShader.uniform_mat4("lightSpaceMatrix", glm::value_ptr(lightSpaceMatrix));
+                currentShader.uniform_int("shadowMap", 2);
+                currentShader.uniform_1f("bias", gui.shadow_bias);
 
-            // Lights
-            {
-                VAO1.bind();
-                VBO1.bind();
-                float lightScale = 0.03f;
-                for (int i = 0; i < NR_POINT_LIGHTS; i++) {
-                    // light matrix
-                    glm::vec3 lightPos = pointLightPositions[i];
-                    glm::vec3 lightColor = pointLightColors[i];
-                    glm::mat4 light_model = glm::mat4(1.0f);
-                    light_model = glm::translate(light_model, lightPos);
-                    light_model = glm::scale(light_model, glm::vec3(lightScale, lightScale, lightScale));
-                    lightShader.use();
-                    lightShader.uniform_3f("color", pointLightColors[i].x, pointLightColors[i].y, pointLightColors[i].z);
-                    lightShader.uniform_mat4("model", glm::value_ptr(light_model));
-                    camera.Matrix(lightShader);
-                    glDrawArrays(GL_TRIANGLES, 0, 36);
+                // Plane
+                {
+                    float tiling = 0.5f;
+
+                    floor_texture.bind(GL_TEXTURE0);
+                    // white texture override
+                    white_texture.bind(GL_TEXTURE0);
+                    floor_spec_texture.bind(GL_TEXTURE1);
+                    currentShader.use();
+                    glm::mat4 model = glm::mat4(1.0f);
+                    model = glm::scale(model, glm::vec3(scaleFactor));  // it's a bit too big for our scene, so scale it down
+                    model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
+                    currentShader.uniform_mat4("model", glm::value_ptr(model));
+                    currentShader.uniform_2f("tiling", tiling, tiling);
+                    camera.Matrix(currentShader);
+                    cubePilePlaneModel.Draw(currentShader);
+                }
+
+                // Cubes Pile
+                if (false) {
+                    float tiling = 1.00f;
+                    veneer_texture.bind(GL_TEXTURE0);
+                    // white texture override
+                    white_texture.bind(GL_TEXTURE0);
+                    veneer_spec_texture.bind(GL_TEXTURE1);
+                    currentShader.use();
+                    glm::mat4 model = glm::mat4(1.0f);
+                    model = glm::scale(model, glm::vec3(scaleFactor));  // it's a bit too big for our scene, so scale it down
+                    model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
+                    currentShader.uniform_mat4("model", glm::value_ptr(model));
+                    currentShader.uniform_2f("tiling", tiling, tiling);
+                    camera.Matrix(currentShader);
+                    cubePileModel.Draw(currentShader);
+                }
+
+                // Suzanne
+                {
+                    float tiling = 0.1f;
+                    white_texture.bind(GL_TEXTURE0);
+                    white_specular_texture.bind(GL_TEXTURE1);
+                    currentShader.use();
+                    glm::mat4 model = glm::mat4(1.0f);
+                    model = glm::scale(model, glm::vec3(scaleFactor));  // it's a bit too big for our scene, so scale it down
+                    model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
+                    currentShader.uniform_mat4("model", glm::value_ptr(model));
+                    currentShader.uniform_2f("tiling", tiling, tiling);
+                    camera.Matrix(currentShader);
+                    cubePileSuzanneModel.Draw(currentShader);
+                }
+
+                // Lights
+                {
+                    VAO1.bind();
+                    VBO1.bind();
+                    float lightScale = 0.03f;
+                    for (int i = 0; i < NR_POINT_LIGHTS; i++) {
+                        // light matrix
+                        glm::vec3 lightPos = pointLightPositions[i];
+                        glm::vec3 lightColor = pointLightColors[i];
+                        glm::mat4 light_model = glm::mat4(1.0f);
+                        light_model = glm::translate(light_model, lightPos);
+                        light_model = glm::scale(light_model, glm::vec3(lightScale, lightScale, lightScale));
+                        lightShader.use();
+                        lightShader.uniform_3f("color", pointLightColors[i].x, pointLightColors[i].y, pointLightColors[i].z);
+                        lightShader.uniform_mat4("model", glm::value_ptr(light_model));
+                        camera.Matrix(lightShader);
+                        glDrawArrays(GL_TRIANGLES, 0, 36);
+                    }
                 }
             }
         }

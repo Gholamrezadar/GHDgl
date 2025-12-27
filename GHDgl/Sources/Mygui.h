@@ -26,7 +26,10 @@ public:
     float angle = 55.0f;
 
     unsigned int shadowMap;
-    float shadow_bias = 0.00001f;
+    float shadow_bias = 0.001f;
+    float near_plane = 0.0f;
+    float far_plane = 13.0f;
+    float ortho_size = 0.8f;
     glm::vec3* DirLightPos = nullptr; 
     std::vector<std::string> logs;
 

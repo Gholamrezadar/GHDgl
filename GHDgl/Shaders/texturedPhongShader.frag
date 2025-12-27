@@ -40,7 +40,7 @@ in vec3 FragPos;
 in vec4 FragPosLightSpace;
 
 
-float ShadowCalculation(vec4 fragPosLightSpace)
+float ShadowCalculation(vec4 fragPosLightSpace, float n_bias)
 {
     // Transform from clip space to [0,1] range for texture lookup
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
@@ -63,15 +63,17 @@ float ShadowCalculation(vec4 fragPosLightSpace)
     float shadow = 0.0;
     vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
     int n = 3;
+
     for(int x = -n; x <= n; ++x)
     {
         for(int y = -n; y <= n; ++y)
         {
             float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
-            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
+            shadow += currentDepth - n_bias > pcfDepth ? 1.0 : 0.0;
         }
     }
     shadow /= (2*n+1)*(2*n+1);
+
 
     // float shadow=0.0f;
     // shadow = currentDepth - bias > texture(shadowMap, projCoords.xy).r ? 1.0 : 0.0;
@@ -108,10 +110,16 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, v
     specular *= attenuation;
     diffuse *= attenuation;
 
+
+    // bias based on the direction of light and frag normal
+    float n_bias = max(mix(bias, 0.00, dot(normal, lightDir)), 0.00001);
+
+
     // shadow
-    float shadow = ShadowCalculation(FragPosLightSpace);
+    float shadow = ShadowCalculation(FragPosLightSpace, n_bias);
+
     // lift the shadows
-    shadow = shadow - 0.09;
+    // shadow = shadow - 0.09;
     vec3 lighting = (ambient*(1.0-shadow) + ambient*0.4 + (1.0 - shadow) * (diffuse + specular));
     return lighting;
 }
