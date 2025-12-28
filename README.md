@@ -51,13 +51,19 @@ cmake --build .
 
 ## Dev Log
 
+## 38. Shadow Map Improvements
+
+I tried some techniques to improve the shadow mapping quality, but still have some issues. Polygon shaped artifacts.
+
+![shadow_map_improvements](demos/shadow_map_some_fixes_closeup.png)
+
 ## 37. Directional Shadow Map
 
-Implemented directional shadow map + PCF
+Implemented directional shadow map + PCF (Shadow on the ground is good but self shadowing is bad)
 
 ![directional_shadow_map](demos/shadow_map_pcf.png)
 
-On another scene with higher res shadow map:
+On another scene with higher res shadow map: (Doesn't look good with low bias, huge peter panning with high bias)
 
 ![directional_shadow_map_pile](demos/shadow_map_cube_pile.png)
 
