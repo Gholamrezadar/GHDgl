@@ -17,9 +17,6 @@
 #include <string>
 #include <vector>
 
-
-
-
 #include "Camera.h"
 #include "EBO.h"
 #include "Mesh.h"
@@ -138,6 +135,12 @@ int main() {
     fullscreenShader.use();
     fullscreenShader.uniform_int("color", 0);  // fullscreen color texture from fbo
     fullscreenShader.uniform_int("depth", 1);  // fullscreen depth texture from fbo
+
+    // PBR Shader
+    Shader pbrShader("Shaders/pbrShader.vert", "Shaders/pbrShader.frag");
+    pbrShader.uniform_3f("color", 1.0f, 0.0f, 0.0f);
+    pbrShader.uniform_mat4("model", glm::value_ptr(model));
+    pbrShader.uniform_3f("viewPos", camera.Position.x, camera.Position.y, camera.Position.z);
 
     // Light settings
     float ambient = 0.35f;
@@ -272,9 +275,30 @@ int main() {
     instancedShader.uniform_int("material.specular", 1);
     instancedShader.uniform_1f("material.shininess", 64.0f);
 
+    // Lights for pbrshader
+    pbrShader.use();
+    // blue light
+    pbrShader.uniform_3f("lights[0].position", pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
+    pbrShader.uniform_3f("lights[0].color", pointLightColors[0].x, pointLightColors[0].y, pointLightColors[0].z);
+
+    // red light
+    pbrShader.uniform_3f("lights[1].position", pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);
+    pbrShader.uniform_3f("lights[1].color", pointLightColors[1].x, pointLightColors[1].y, pointLightColors[1].z);
+
+    // white light also has ambient
+    pbrShader.uniform_3f("lights[2].position", pointLightPositions[2].x, pointLightPositions[2].y, pointLightPositions[2].z);
+    pbrShader.uniform_3f("lights[2].color", pointLightColors[2].x, pointLightColors[2].y, pointLightColors[2].z);
+
+
+    // green light
+    pbrShader.uniform_3f("lights[3].position", pointLightPositions[3].x, pointLightPositions[3].y, pointLightPositions[3].z);
+    pbrShader.uniform_3f("lights[3].color", pointLightColors[3].x, pointLightColors[3].y, pointLightColors[3].z);
+
+
     camera.Matrix(currentShader);    // this is what moves your object
     camera.Matrix(normalMapShader);  // this is what moves your object
     camera.Matrix(instancedShader);
+    camera.Matrix(pbrShader);
 
     // light Shader (basic white color shader)
     Shader lightShader("Shaders/flatShader.vert", "Shaders/flatShader.frag");
@@ -556,7 +580,6 @@ int main() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 #pragma endregion
 
-
 #pragma region Directional Shadow Map
     unsigned int shadowMapFBO;
     unsigned int shadowMap;
@@ -574,7 +597,7 @@ int main() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, glm::value_ptr(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)));
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, glm::value_ptr(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)));
     // imgui display swizzle hack (r, 0, 0, 1) -> (r, r, r, 1)
     GLint swizzleMask[] = {GL_RED, GL_RED, GL_RED, GL_ONE};
     glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
@@ -732,9 +755,6 @@ int main() {
             currentShader.uniform_mat4("model", glm::value_ptr(model));
             camera.Matrix(currentShader);
             ourModel.Draw(currentShader);
-
-            
-
         }
 
         // Render Culled Box and Bunny inside Scene
@@ -877,11 +897,10 @@ int main() {
                 glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFBO);
                 glViewport(0, 0, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT);
                 glClear(GL_DEPTH_BUFFER_BIT);
-                glEnable(GL_POLYGON_OFFSET_FILL); // disable later
+                glEnable(GL_POLYGON_OFFSET_FILL);  // disable later
                 glPolygonOffset(3.0f, 6.0f);
                 // glEnable(GL_CULL_FACE);
                 // glCullFace(GL_FRONT); // disable later
-
 
                 shadowMapShader.use();
                 shadowMapShader.uniform_mat4("lightSpaceMatrix", glm::value_ptr(lightSpaceMatrix));
@@ -1030,7 +1049,6 @@ int main() {
             }
         }
 
-
         // dragon Scene (Shadow Map)
         if (false) {
             // recalculate the lightSpaceMatrix from gui
@@ -1049,11 +1067,10 @@ int main() {
                 glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFBO);
                 glViewport(0, 0, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT);
                 glClear(GL_DEPTH_BUFFER_BIT);
-                glEnable(GL_POLYGON_OFFSET_FILL); // disable later
+                glEnable(GL_POLYGON_OFFSET_FILL);  // disable later
                 glPolygonOffset(3.0f, 6.0f);
                 // glEnable(GL_CULL_FACE);
                 // glCullFace(GL_FRONT); // disable later
-
 
                 shadowMapShader.use();
                 shadowMapShader.uniform_mat4("lightSpaceMatrix", glm::value_ptr(lightSpaceMatrix));
@@ -1135,7 +1152,6 @@ int main() {
                     camera.Matrix(currentShader);
                     cubePilePlaneModel.Draw(currentShader);
                 }
-
 
                 // Suzanne
                 {
@@ -1286,9 +1302,8 @@ int main() {
             }
         }
 
-
-        // Suzanne only scene
-        if (true) {
+        // Suzanne only scene (Reflection cubemap)
+        if (false) {
             // float scaleFactor = 0.04f;
             float scaleFactor = 0.4f;
             float zRotation = 45.0f;
@@ -1311,7 +1326,6 @@ int main() {
                 skyboxReflectiveShader.uniform_3f("cameraPos", camera.Position.x, camera.Position.y, camera.Position.z);
                 cubePileSuzanneModel.Draw(skyboxReflectiveShader);
                 dragonModel.Draw(skyboxReflectiveShader);
-
             }
 
             // Suzanne Normal Viz
@@ -1458,6 +1472,55 @@ int main() {
                     camera.Matrix(lightShader);
                     glDrawArrays(GL_TRIANGLES, 0, 36);
                 }
+            }
+        }
+
+        // PBR scene
+        if (true) {
+            // container_texture.bind(GL_TEXTURE0);
+            float scaleFactor = 0.4f;
+            float zRotation = 45.0f;
+
+            // Render the lights
+            const float lightScale = 0.03f;
+            for (int i = 0; i < NR_POINT_LIGHTS; i++) {
+                // light matrix
+                glm::vec3 lightPos = pointLightPositions[i];
+                glm::vec3 lightColor = pointLightColors[i];
+                glm::mat4 light_model = glm::mat4(1.0f);
+                light_model = glm::translate(light_model, lightPos);
+                light_model = glm::scale(light_model, glm::vec3(lightScale, lightScale, lightScale));
+                lightShader.use();
+                lightShader.uniform_3f("color", pointLightColors[i].x, pointLightColors[i].y, pointLightColors[i].z);
+                lightShader.uniform_mat4("model", glm::value_ptr(light_model));
+                camera.Matrix(lightShader);
+                glDrawArrays(GL_TRIANGLES, 0, 36);
+            }
+            
+            // dragon
+            {
+                // floor_texture.bind(GL_TEXTURE0);
+                pbrShader.use();
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::scale(model, glm::vec3(scaleFactor));  // it's a bit too big for our scene, so scale it down
+                model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
+                model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+                pbrShader.uniform_mat4("model", glm::value_ptr(model));
+                pbrShader.uniform_3f("color", 1.0f, 1.0f, 1.0f);
+                pbrShader.uniform_3f("camPos", camera.Position.x, camera.Position.y, camera.Position.z);
+
+                pbrShader.uniform_1f("metallic", gui.metallic);
+                pbrShader.uniform_1f("roughness", gui.roughness);
+                pbrShader.uniform_1f("ao", 1.0f);
+                camera.Matrix(pbrShader);
+                dragonModel.Draw(pbrShader);
+
+                
+
+                 
+   
+
+
             }
         }
 

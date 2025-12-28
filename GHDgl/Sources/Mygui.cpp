@@ -92,6 +92,9 @@ void MyGUI3::modelRotationUI(Shader & flatTextureShader)
     ImGui::DragFloat("Near plane", &near_plane, 0.1f, 0.0f, 50.0f, "%.3f");
     ImGui::DragFloat("Far plane", &far_plane, 0.1f, 0.0f, 50.0f, "%.3f");
     ImGui::DragFloat("Ortho size", &ortho_size, 0.1f, 0.0f, 50.0f, "%.3f");
+    ImGui::DragFloat("Metallic", &metallic, 0.01f, 0.0f, 1.0f, "%.3f");
+    ImGui::DragFloat("Roughness", &roughness, 0.01f, 0.0f, 1.0f, "%.3f");
+    ImGui::DragFloat("light Power", &light_power, 1.0f, 0.0f, 100.0f, "%.3f");
     ImGui::End();
 }
 

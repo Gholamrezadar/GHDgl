@@ -51,6 +51,12 @@ cmake --build .
 
 ## Dev Log
 
+## 39. PBR Materials
+
+Implemented PBR materials.
+
+![pbr_v1](demos/pbr_v1.png)
+
 ## 38. Shadow Map Improvements
 
 I tried some techniques to improve the shadow mapping quality, but still have some issues. Polygon shaped artifacts.

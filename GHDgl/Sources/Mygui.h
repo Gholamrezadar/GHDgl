@@ -33,6 +33,10 @@ public:
     glm::vec3* DirLightPos = nullptr; 
     std::vector<std::string> logs;
 
+    float metallic = 1.0f;
+    float roughness = 0.75f;
+    float light_power = 10.0f;
+
     glm::vec3 triangleColor = glm::vec3(1.0f, 0.0f, 0.0f);
 
     MyGUI3();
