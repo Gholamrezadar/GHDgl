@@ -425,6 +425,7 @@ int main() {
     Model cubePileModel("Models/cubes_pile.obj");
     Model cubePilePlaneModel("Models/cubes_pile_plane.obj");
     Model cubePileSuzanneModel("Models/cubes_pile_suzanne_smooth.obj");
+    Model dragonModel("Models/dragon.obj");
 
 #pragma region Skybox
     // Load skybox
@@ -555,11 +556,12 @@ int main() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 #pragma endregion
 
+
 #pragma region Directional Shadow Map
     unsigned int shadowMapFBO;
     unsigned int shadowMap;
-    constexpr int SHADOW_MAP_WIDTH = 1024 * 8;
-    constexpr int SHADOW_MAP_HEIGHT = 1024 * 8;
+    constexpr int SHADOW_MAP_WIDTH = 1024 * 2;
+    constexpr int SHADOW_MAP_HEIGHT = 1024 * 2;
     glGenFramebuffers(1, &shadowMapFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFBO);
     glGenTextures(1, &shadowMap);
@@ -656,7 +658,7 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Render the cubemap
-        if (false) {
+        if (true) {
             // Don't affect the depth buffer
             glDepthMask(GL_FALSE);
             glActiveTexture(GL_TEXTURE0);
@@ -730,6 +732,9 @@ int main() {
             currentShader.uniform_mat4("model", glm::value_ptr(model));
             camera.Matrix(currentShader);
             ourModel.Draw(currentShader);
+
+            
+
         }
 
         // Render Culled Box and Bunny inside Scene
@@ -855,7 +860,7 @@ int main() {
         }
 
         // Cubes Pile Scene (Shadow Map)
-        if (true) {
+        if (false) {
             // recalculate the lightSpaceMatrix from gui
             glm::mat4 lightProjection = glm::ortho(-gui.ortho_size, gui.ortho_size, -gui.ortho_size, gui.ortho_size, gui.near_plane, gui.far_plane);
             // recalculate the lightSpaceMatrix
@@ -1025,117 +1030,146 @@ int main() {
             }
         }
 
-        // gpt
+
+        // dragon Scene (Shadow Map)
         if (false) {
-            // --------------------------------------------------------
-            // SHARED TRANSFORMS (used in BOTH passes)
-            // --------------------------------------------------------
-            float scaleFactor = 0.04f;
-            float yRotation = 30.0f;
-
-            glm::mat4 sharedModel = glm::mat4(1.0f);
-            sharedModel = glm::scale(sharedModel, glm::vec3(scaleFactor));
-            sharedModel = glm::rotate(sharedModel, glm::radians(yRotation), glm::vec3(0, 1, 0));
-
-            // --------------------------------------------------------
-            // DEFINE A SCENE CENTER (IMPORTANT)
-            // --------------------------------------------------------
-            glm::vec3 sceneCenterWS = glm::vec3(sharedModel * glm::vec4(0, 0, 0, 1));
-
-            // --------------------------------------------------------
-            // LIGHT SETUP (SWITCH BETWEEN THESE TWO)
-            // --------------------------------------------------------
-
-            // ===== OPTION A: YOUR CURRENT METHOD =====
-            if (false) {
-                lightView = glm::lookAt(
-                    DirLightPos,
-                    glm::vec3(0.0f, 0.0f, 0.0f),
-                    glm::vec3(0.0f, 1.0f, 0.0f));
-            }
-
-            // ===== OPTION B: SCENE-CENTERED DIRECTIONAL LIGHT =====
-            if (true) {
-                glm::vec3 lightDir = glm::normalize(glm::vec3(-1.0f, -1.0f, -0.3f));
-                float lightDistance = 6.0f;
-
-                glm::vec3 lightPos = sceneCenterWS - lightDir * lightDistance;
-
-                lightView = glm::lookAt(
-                    lightPos,
-                    sceneCenterWS,
-                    glm::vec3(0.0f, 1.0f, 0.0f));
-            }
-
-            // --------------------------------------------------------
-            // LIGHT PROJECTION (INTENTIONALLY FIXED)
-            // --------------------------------------------------------
-            float orthoSize = 4.0f;
-            lightProjection = glm::ortho(
-                -orthoSize, orthoSize,
-                -orthoSize, orthoSize,
-                0.1f, 15.0f);
+            // recalculate the lightSpaceMatrix from gui
+            glm::mat4 lightProjection = glm::ortho(-gui.ortho_size, gui.ortho_size, -gui.ortho_size, gui.ortho_size, gui.near_plane, gui.far_plane);
+            // recalculate the lightSpaceMatrix
+            lightView = glm::lookAt(DirLightPos,
+                                    glm::vec3(0.0f, 0.0f, 0.0f),
+                                    glm::vec3(0.0f, 1.0f, 0.0f));
 
             lightSpaceMatrix = lightProjection * lightView;
+            float scaleFactor = 1.0f;
+            float zRotation = 45.0f;
 
-            // ========================================================
-            // 1️⃣ SHADOW MAP PASS
-            // ========================================================
+            // Render the shadow map
             if (true) {
                 glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFBO);
                 glViewport(0, 0, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT);
                 glClear(GL_DEPTH_BUFFER_BIT);
+                glEnable(GL_POLYGON_OFFSET_FILL); // disable later
+                glPolygonOffset(3.0f, 6.0f);
+                // glEnable(GL_CULL_FACE);
+                // glCullFace(GL_FRONT); // disable later
+
 
                 shadowMapShader.use();
                 shadowMapShader.uniform_mat4("lightSpaceMatrix", glm::value_ptr(lightSpaceMatrix));
-
-                // ---- Plane ----
+                // Render the scene with shadowMapShader from the pov of the light
+                // float scaleFactor = 0.04f;
+                // float zRotation = 45.0f;
+                // Plane
                 {
-                    shadowMapShader.uniform_mat4("model", glm::value_ptr(sharedModel));
+                    shadowMapShader.use();
+                    glm::mat4 model = glm::mat4(1.0f);
+                    model = glm::scale(model, glm::vec3(scaleFactor));  // it's a bit too big for our scene, so scale it down
+                    model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
+                    shadowMapShader.uniform_mat4("model", glm::value_ptr(model));
+                    // camera.Matrix(currentShader);
                     cubePilePlaneModel.Draw(shadowMapShader);
                 }
 
-                // ---- Suzanne ----
+                // Suzanne
+
                 {
-                    shadowMapShader.uniform_mat4("model", glm::value_ptr(sharedModel));
-                    cubePileSuzanneModel.Draw(shadowMapShader);
+                    shadowMapShader.use();
+                    glm::mat4 model = glm::mat4(1.0f);
+                    model = glm::scale(model, glm::vec3(scaleFactor));  // it's a bit too big for our scene, so scale it down
+                    model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
+                    shadowMapShader.uniform_mat4("model", glm::value_ptr(model));
+                    // camera.Matrix(currentShader);
+                    dragonModel.Draw(shadowMapShader);
                 }
 
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                // glCullFace(GL_BACK); // don't forget to reset original culling face
+                // glDisable(GL_CULL_FACE);
+                glDisable(GL_POLYGON_OFFSET_FILL);
             }
 
-            // ========================================================
-            // 2️⃣ MAIN RENDER PASS
-            // ========================================================
+            // Render the scene normally
             if (true) {
                 glBindFramebuffer(GL_FRAMEBUFFER, fboMSAA);
                 glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
                 glEnable(GL_DEPTH_TEST);
-                glClearColor(0.05f, 0.07f, 0.09f, 1.0f);
-                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                // glClearColor(0.05f, 0.07f, 0.09f, 1.0f);
+                glClear(GL_DEPTH_BUFFER_BIT);
 
-                // Bind shadow map
+                // backface trick
+                // glEnable(GL_FRONT);
+
+                // white texture override
+                white_texture.bind(GL_TEXTURE0);
+                white_specular_texture.bind(GL_TEXTURE1);
+
+                container_texture.bind(GL_TEXTURE0);
+                container_specular_texture.bind(GL_TEXTURE1);
+
+                // bind shadow map (as texture "2")
                 glActiveTexture(GL_TEXTURE2);
                 glBindTexture(GL_TEXTURE_2D, shadowMap);
 
                 currentShader.use();
+
+                // shadow map uniforms
                 currentShader.uniform_mat4("lightSpaceMatrix", glm::value_ptr(lightSpaceMatrix));
                 currentShader.uniform_int("shadowMap", 2);
+                currentShader.uniform_1f("bias", gui.shadow_bias);
 
-                camera.Matrix(currentShader);
-
-                // ---- Plane ----
+                // Plane
                 {
-                    currentShader.uniform_mat4("model", glm::value_ptr(sharedModel));
-                    currentShader.uniform_2f("tiling", 0.5f, 0.5f);
+                    float tiling = 0.5f;
+
+                    floor_texture.bind(GL_TEXTURE0);
+                    // white texture override
+                    white_texture.bind(GL_TEXTURE0);
+                    floor_spec_texture.bind(GL_TEXTURE1);
+                    currentShader.use();
+                    glm::mat4 model = glm::mat4(1.0f);
+                    model = glm::scale(model, glm::vec3(scaleFactor));  // it's a bit too big for our scene, so scale it down
+                    model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
+                    currentShader.uniform_mat4("model", glm::value_ptr(model));
+                    currentShader.uniform_2f("tiling", tiling, tiling);
+                    camera.Matrix(currentShader);
                     cubePilePlaneModel.Draw(currentShader);
                 }
 
-                // ---- Suzanne ----
+
+                // Suzanne
                 {
-                    currentShader.uniform_mat4("model", glm::value_ptr(sharedModel));
-                    currentShader.uniform_2f("tiling", 1.0f, 1.0f);
-                    cubePileSuzanneModel.Draw(currentShader);
+                    float tiling = 0.1f;
+                    white_texture.bind(GL_TEXTURE0);
+                    white_specular_texture.bind(GL_TEXTURE1);
+                    currentShader.use();
+                    glm::mat4 model = glm::mat4(1.0f);
+                    model = glm::scale(model, glm::vec3(scaleFactor));  // it's a bit too big for our scene, so scale it down
+                    model = glm::rotate(model, glm::radians(zRotation), glm::vec3(0.0f, 1.0f, 0.0f));
+                    currentShader.uniform_mat4("model", glm::value_ptr(model));
+                    currentShader.uniform_2f("tiling", tiling, tiling);
+                    camera.Matrix(currentShader);
+                    dragonModel.Draw(currentShader);
+                }
+
+                // Lights
+                {
+                    VAO1.bind();
+                    VBO1.bind();
+                    float lightScale = 0.03f;
+                    for (int i = 0; i < NR_POINT_LIGHTS; i++) {
+                        // light matrix
+                        glm::vec3 lightPos = pointLightPositions[i];
+                        glm::vec3 lightColor = pointLightColors[i];
+                        glm::mat4 light_model = glm::mat4(1.0f);
+                        light_model = glm::translate(light_model, lightPos);
+                        light_model = glm::scale(light_model, glm::vec3(lightScale, lightScale, lightScale));
+                        lightShader.use();
+                        lightShader.uniform_3f("color", pointLightColors[i].x, pointLightColors[i].y, pointLightColors[i].z);
+                        lightShader.uniform_mat4("model", glm::value_ptr(light_model));
+                        camera.Matrix(lightShader);
+                        glDrawArrays(GL_TRIANGLES, 0, 36);
+                    }
                 }
             }
         }
@@ -1252,12 +1286,14 @@ int main() {
             }
         }
 
+
         // Suzanne only scene
-        if (false) {
-            float scaleFactor = 0.04f;
+        if (true) {
+            // float scaleFactor = 0.04f;
+            float scaleFactor = 0.4f;
             float zRotation = 45.0f;
-            glEnable(GL_POLYGON_OFFSET_FILL);
-            glPolygonOffset(1.0f, 1.0f);
+            // glEnable(GL_POLYGON_OFFSET_FILL);
+            // glPolygonOffset(1.0f, 1.0f);
             // Suzanne
             {
                 float tiling = 0.1f;
@@ -1272,11 +1308,14 @@ int main() {
                 skyboxReflectiveShader.uniform_mat4fv("view", glm::value_ptr(camera.GetViewMatrix()));
                 skyboxReflectiveShader.uniform_mat4fv("projection", glm::value_ptr(camera.GetProjectionMatrix()));
                 skyboxReflectiveShader.uniform_1f("amount", amount);
-                cubePileSuzanneModel.Draw(currentShader);
+                skyboxReflectiveShader.uniform_3f("cameraPos", camera.Position.x, camera.Position.y, camera.Position.z);
+                cubePileSuzanneModel.Draw(skyboxReflectiveShader);
+                dragonModel.Draw(skyboxReflectiveShader);
+
             }
 
             // Suzanne Normal Viz
-            if (true) {
+            if (false) {
                 float normalLength = 0.003f;  // length of normal lines
 
                 normalDebugShader.use();

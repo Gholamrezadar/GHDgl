@@ -115,11 +115,14 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, v
     float n_bias = max(mix(bias, 0.00, dot(normal, lightDir)), 0.00001);
 
 
-    // shadow
-    float shadow = ShadowCalculation(FragPosLightSpace, n_bias);
-
+    // shadow mapping
+    // float shadow = ShadowCalculation(FragPosLightSpace, n_bias);
     // lift the shadows
     // shadow = shadow - 0.09;
+    // vec3 lighting = (ambient*(1.0-shadow) + ambient*0.4 + (1.0 - shadow) * (diffuse + specular));
+
+    // no shadow mapping
+    float shadow = 0.0;
     vec3 lighting = (ambient*(1.0-shadow) + ambient*0.4 + (1.0 - shadow) * (diffuse + specular));
     return lighting;
 }
@@ -146,7 +149,7 @@ void main()
     // result = vec3(1.0-shadow);
 
     FragColor = vec4(result, 1.0);
-    // FragColor = vec4(norm, 1.0);
+    FragColor = vec4(norm, 1.0);
 
 }
 
