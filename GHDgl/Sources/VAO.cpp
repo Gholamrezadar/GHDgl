@@ -8,7 +8,7 @@ VAO::VAO()
 }
 
 // Links a VBO Attribute such as a position or color to the VAO
-void VAO::linkAttrib(GLuint layout, GLuint numComponents, GLenum type, GLsizeiptr stride, void* offset)
+void VAO::linkAttrib(GLuint layout, GLuint numComponents, GLenum type, GLsizei stride, void* offset)
 {
 	glVertexAttribPointer(layout, numComponents, type, GL_FALSE, stride, offset);
 	glEnableVertexAttribArray(layout);

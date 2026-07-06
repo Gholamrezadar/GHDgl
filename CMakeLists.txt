@@ -43,10 +43,10 @@ include_directories(
 )
 
 # Add glfw library
-add_subdirectory(vendor/glfw)
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE) # don't build docs
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE) # don't build tests
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE) # don't build examples
+add_subdirectory(vendor/glfw)
 
 # Add glad as a library
 add_library(glad STATIC vendor/glad/src/glad.c)
@@ -61,7 +61,14 @@ add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS}
                             ${PROJECT_SHADERS} ${IMGUI_SOURCES})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_NAME})
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
+)
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${CMAKE_SOURCE_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_SOURCE_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_SOURCE_DIR}"
+)
 
 # Assimp library
 if (WIN32)
@@ -80,19 +87,28 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         ${OPENGL_LIBRARIES}
 )
 
-# Copy Shaders into the build directory
-add_custom_command(
-    TARGET ${PROJECT_NAME} PRE_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/Shaders $<TARGET_FILE_DIR:${PROJECT_NAME}>/Shaders
-    DEPENDS ${PROJECT_SHADERS}
-)
+# # Unity Build
+# set_target_properties(${PROJECT_NAME} PROPERTIES
+#     UNITY_BUILD ON
+# )
+# # Required for ImGui
+# target_compile_definitions(${PROJECT_NAME} PRIVATE
+#     IMGUI_DEFINE_MATH_OPERATORS
+# )
 
-# Copy Images into the build directory
-add_custom_command(
-    TARGET ${PROJECT_NAME} PRE_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/Media/ $<TARGET_FILE_DIR:${PROJECT_NAME}>
-    DEPENDS ${PROJECT_IMAGES} ${PROJECT_MODELS}
-)
+# Copy Shaders into the build directory
+# add_custom_command(
+#     TARGET ${PROJECT_NAME} PRE_BUILD
+#     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/Shaders $<TARGET_FILE_DIR:${PROJECT_NAME}>/Shaders
+#     DEPENDS ${PROJECT_SHADERS}
+# )
+
+# # Copy Images into the build directory
+# add_custom_command(
+#     TARGET ${PROJECT_NAME} PRE_BUILD
+#     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/Media/ $<TARGET_FILE_DIR:${PROJECT_NAME}>
+#     DEPENDS ${PROJECT_IMAGES} ${PROJECT_MODELS}
+# )
 
 # copy assimp-vc143-mtd.dll into the build directory (Note: Change to the assimp.dll you built using your own compiler!)
 if(WIN32)

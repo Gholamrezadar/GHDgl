@@ -4,3 +4,7 @@ cmake-build-debug/
 .idea
 .vs
 out/
+assimp-vc143-mtd.dll
+libassimp.so.6
+GHDgl.exe
+GHDgl.pdb

@@ -1398,7 +1398,7 @@ int main() {
             instancedShader.uniform_mat4("model", glm::value_ptr(model));
             camera.Matrix(instancedShader);
             camera.UpdatePositionInShader(instancedShader);
-            glDrawArraysInstanced(GL_TRIANGLES, 0, 36, instancePositions.size());
+            glDrawArraysInstanced(GL_TRIANGLES, 0, 36, (GLsizei)instancePositions.size());
         }
 
         // Naive Instancing scene
